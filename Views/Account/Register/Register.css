@@ -1,0 +1,24 @@
+.password-requirements {
+    background: var(--gray-100);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    font-size: var(--font-size-sm);
+}
+
+.password-requirements h6 {
+    margin-bottom: var(--spacing-sm);
+    color: var(--primary-color);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-base);
+}
+
+.password-requirements ul {
+    margin: 0;
+    padding-left: var(--spacing-lg);
+}
+
+.password-requirements li {
+    color: var(--gray-700);
+    margin-bottom: var(--spacing-xs);
+}
