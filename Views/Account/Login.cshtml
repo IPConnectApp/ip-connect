@@ -1,0 +1,65 @@
+@model ip_connect.DTOs.Account.LoginDto
+@{
+    ViewData["Title"] = "Login";
+    Layout = "_AuthLayout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth-common.css" />
+    <link rel="stylesheet" href="~/css/account/login.css" />
+}
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1><i class="fas fa-comments"></i> IP Connect</h1>
+            <p>Welcome back! Please login to continue</p>
+        </div>
+        <div class="auth-body">
+            <form asp-action="Login" asp-controller="Account" method="post">
+                
+                <!-- Hidden field preserves returnUrl through form submission -->
+                <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+                
+                @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <ul class="mb-0">
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+                <div class="form-floating">
+                    <input asp-for="Email" class="form-control" id="emailInput" placeholder="name@example.com" autocomplete="email">
+                    <label for="emailInput"><i class="fas fa-envelope"></i> Email address</label>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating">
+                    <input asp-for="Password" class="form-control" id="passwordInput" placeholder="Password" type="password" autocomplete="current-password">
+                    <label for="passwordInput"><i class="fas fa-lock"></i> Password</label>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input asp-for="RememberMe" class="form-check-input" type="checkbox" id="rememberMeCheck">
+                    <label class="form-check-label" for="rememberMeCheck">
+                        Remember me for 7 days
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-auth">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+
+                <div class="auth-link">
+                    Don't have an account? <a asp-action="Register" asp-controller="Account">Create one</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -6,7 +6,6 @@ namespace ip_connect.Services.Account
 {
     public class AccountService : IAccountService
     {
-        //We use UserManager and SignInManager from ASP.NET Core Identity for user management, not custom repositories
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
@@ -18,10 +17,10 @@ namespace ip_connect.Services.Account
             _signInManager = signInManager;
         }
 
-        public async Task<IdentityResult> RegisterAsync(RegisterDto dto)
+        public async Task<IdentityResult> RegisterAsync(RegisterDto registerDto)
         {
             // Check if email already exists
-            var existingUserByEmail = await _userManager.FindByEmailAsync(dto.Email);
+            var existingUserByEmail = await _userManager.FindByEmailAsync(registerDto.Email);
             if (existingUserByEmail != null)
             {
                 return IdentityResult.Failed(new IdentityError
@@ -32,7 +31,7 @@ namespace ip_connect.Services.Account
             }
 
             // Check if username already exists
-            var existingUserByUsername = await _userManager.FindByNameAsync(dto.UserName);
+            var existingUserByUsername = await _userManager.FindByNameAsync(registerDto.UserName);
             if (existingUserByUsername != null)
             {
                 return IdentityResult.Failed(new IdentityError
@@ -42,33 +41,57 @@ namespace ip_connect.Services.Account
                 });
             }
 
+            // Create new user
             var user = new ApplicationUser
             {
-                UserName = dto.UserName,
-                Email = dto.Email,
+                UserName = registerDto.UserName,
+                Email = registerDto.Email,
                 CreatedAt = DateTime.UtcNow
             };
 
-            //Create user with password (Identity hash it automatically)
-            var result = await _userManager.CreateAsync(user, dto.Password);
-
-            // If registration successful, sign in the user
-            if (result.Succeeded)
-            {
-                await _signInManager.SignInAsync(user, isPersistent: false);
-            }
+            // Create user with password (Identity will hash it automatically)
+            var result = await _userManager.CreateAsync(user, registerDto.Password);
 
             return result;
         }
 
-        public Task<bool> LoginAsync(LoginDto dto)
+        public async Task<(bool Success, string ErrorMessage)> LoginAsync(LoginDto loginDto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                // Check if user exists by email
+                var user = await _userManager.FindByEmailAsync(loginDto.Email);
+                if (user == null)
+                {
+                    return (false, "No account found with this email address");
+                }
+
+                // Attempt to sign in with password
+                var result = await _signInManager.PasswordSignInAsync(
+                    user.UserName!,
+                    loginDto.Password,
+                    loginDto.RememberMe,
+                    lockoutOnFailure: false
+                );
+
+                // Check specific failure reasons
+                if (result.Succeeded)
+                {
+                    return (true, string.Empty);
+                }
+
+                // Default error for wrong password
+                return (false, "Invalid email or password");
+            }
+            catch (Exception ex)
+            {
+                return (false, "An unexpected error occurred during login. Please try again");
+            }
         }
 
-        public Task LogoutAsync()
+        public async Task LogoutAsync()
         {
-            throw new NotImplementedException();
+            await _signInManager.SignOutAsync();
         }
     }
 }

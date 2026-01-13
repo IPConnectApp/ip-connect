@@ -1,0 +1,51 @@
+@{
+    ViewData["Title"] = "Home - IP Connect";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/variables.css" />
+    <style>
+        body {
+            background: var(--gradient-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: var(--font-family-primary);
+            text-align: center;
+        }
+        .welcome-box {
+            background: white;
+            color: var(--gray-900);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 { color: var(--primary-color); }
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-box">
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <h1>✅ Welcome, @ViewBag.Username!</h1>
+            <p>You are logged in successfully!</p>
+            <p><a href="/account/logout">Logout</a></p>
+        }
+        else
+        {
+            <h1>Welcome to IP Connect</h1>
+            <p><a href="/account/login">Login</a> | <a href="/account/register">Register</a></p>
+        }
+    </div>
+</body>
+</html>

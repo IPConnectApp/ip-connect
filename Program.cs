@@ -37,7 +37,16 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequireLowercase = true;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
+// Provides token generation for account verification and password recovery
 .AddDefaultTokenProviders();
+
+// Configure authentication cookie settings
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    options.SlidingExpiration = true;
+    options.LoginPath = "/account/login";
+});
 
 // Register Repositories
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();

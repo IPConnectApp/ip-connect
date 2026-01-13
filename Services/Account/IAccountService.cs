@@ -7,7 +7,7 @@ namespace ip_connect.Services.Account
     {
         Task<IdentityResult> RegisterAsync(RegisterDto registerDto);
 
-        Task<bool> LoginAsync(LoginDto loginDto);
+        Task<(bool Success, string ErrorMessage)> LoginAsync(LoginDto loginDto);
         
         Task LogoutAsync();
     }
