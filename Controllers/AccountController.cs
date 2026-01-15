@@ -1,4 +1,5 @@
 using ip_connect.DTOs.Account;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ip_connect.Services.Account
@@ -90,11 +91,27 @@ namespace ip_connect.Services.Account
 
             if (success)
             {
-                return LocalRedirect(returnUrl);
+                if (!string.IsNullOrEmpty(returnUrl) && returnUrl != "/")
+                {
+                    return LocalRedirect(returnUrl);
+                }
+
+                var username = User.Identity?.Name;
+                return RedirectToAction("Index", "Profile");
             }
 
             ModelState.AddModelError(string.Empty, errorMessage);
             return View(model);
+        }
+    
+        // POST: /Account/Logout
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            await _accountService.LogoutAsync();
+            return RedirectToAction("Login", "Account");
         }
     }
 }

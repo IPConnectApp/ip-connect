@@ -1,0 +1,75 @@
+@{
+    var username = ViewData["Username"]?.ToString() ?? User.Identity?.Name ?? "";
+    var currentTab = ViewData["CurrentTab"]?.ToString() ?? "Photos";
+    var isOwnProfile = User.Identity?.Name == username;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - IP Connect</title>
+    
+    <link rel="stylesheet" href="~/css/variables.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="~/css/profile/profile.css" />
+    
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <!-- Top Navbar -->
+    @await Html.PartialAsync("_Navbar")
+
+    <!-- Profile Container -->
+    <div class="profile-container">
+        <!-- Left Sidebar -->
+        <aside class="profile-sidebar">
+            <div class="profile-picture">
+                <img src="https://via.placeholder.com/150" alt="Profile Picture" />
+            </div>
+            <h2 class="profile-name">@username</h2>
+            <div class="profile-info">
+                <p><i class="fas fa-venus-mars"></i> Male, 25</p>
+                <p><i class="fas fa-map-marker-alt"></i> Sofia, Bulgaria</p>
+                <p><i class="fas fa-calendar"></i> Joined January 2026</p>
+            </div>
+            <div class="profile-bio">
+                <p>This is my bio. I love coding and building amazing apps!</p>
+            </div>
+        </aside>
+
+        <!-- Right Content Area -->
+        <main class="profile-content">
+            <!-- Tab Navigation -->
+            <nav class="profile-tabs">
+                <a href="/profile/@username/photos" class="profile-tab @(currentTab == "Photos" ? "active" : "")">
+                    <i class="fas fa-images"></i> Photos
+                </a>
+                <a href="/profile/@username/friends" class="profile-tab @(currentTab == "Friends" ? "active" : "")">
+                    <i class="fas fa-user-friends"></i> Friends
+                </a>
+                
+                @if (isOwnProfile)
+                {
+                    <a href="/profile/@username/chats" class="profile-tab @(currentTab == "Chats" ? "active" : "")">
+                        <i class="fas fa-comments"></i> Chats
+                    </a>
+                    <a href="/profile/@username/settings" class="profile-tab @(currentTab == "Settings" ? "active" : "")">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                }
+            </nav>
+
+            <!-- Tab Content -->
+            <div class="profile-tab-content">
+                @RenderBody()
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

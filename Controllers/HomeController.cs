@@ -6,13 +6,15 @@ namespace ip_connect.Controllers
     {
         public IActionResult Index()
         {
-            // Check if user is logged in
+            // If logged in, redirect to user's profile
             if (User.Identity?.IsAuthenticated == true)
             {
-                ViewBag.Username = User.Identity.Name;
+                var username = User.Identity.Name;
+                return RedirectToAction("Photos", "Profile", new { username });
             }
-            
-            return View();
+
+            // If not logged in, redirect to login
+            return RedirectToAction("Login", "Account");
         }
     }
 }

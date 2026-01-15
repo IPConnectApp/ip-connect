@@ -46,6 +46,20 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.ExpireTimeSpan = TimeSpan.FromDays(7);
     options.SlidingExpiration = true;
     options.LoginPath = "/account/login";
+
+    // Redirect here if user tries to access forbidden resource
+    options.AccessDeniedPath = "/account/accessdenied";
+
+    // Remove ReturnUrl from query string
+    options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
+    {
+        OnRedirectToLogin = context =>
+        {
+            // Always redirect to login without ReturnUrl
+            context.Response.Redirect("/account/login");
+            return Task.CompletedTask;
+        }
+    };
 });
 
 // Register Repositories
@@ -80,8 +94,13 @@ app.MapRazorPages()
    .WithStaticAssets();
 
 app.MapControllerRoute(
- name: "default",
- pattern: "{controller=Home}/{action=Index}/{id?}");
+    name: "profile",
+    pattern: "profile/{username}/{action=Photos}",
+    defaults: new { controller = "Profile" });
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapHub<ip_connect.Hubs.ChatHub>("/chathub");
 
