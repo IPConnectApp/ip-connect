@@ -1,0 +1,77 @@
+@model ip_connect.DTOs.Account.RegisterDto
+@{
+    ViewData["Title"] = "Register";
+    Layout = "_AuthLayout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth-common.css" />
+    <link rel="stylesheet" href="~/css/account/register.css" />
+}
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1><i class="fas fa-comments"></i> IP Connect</h1>
+            <p>Create your account to get started</p>
+        </div>
+        <div class="auth-body">
+            <form asp-action="Register" asp-controller="Account" method="post">
+                
+                @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <ul class="mb-0">
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+                <div class="form-floating">
+                    <input asp-for="UserName" class="form-control" id="usernameInput" placeholder="Username">
+                    <label for="usernameInput"><i class="fas fa-user"></i> Username</label>
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating">
+                    <input asp-for="Email" class="form-control" id="emailInput" placeholder="name@example.com">
+                    <label for="emailInput"><i class="fas fa-envelope"></i> Email address</label>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating">
+                    <input asp-for="Password" class="form-control" id="passwordInput" placeholder="Password" type="password">
+                    <label for="passwordInput"><i class="fas fa-lock"></i> Password</label>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating">
+                    <input asp-for="ConfirmPassword" class="form-control" id="confirmPasswordInput" placeholder="Confirm Password" type="password">
+                    <label for="confirmPasswordInput"><i class="fas fa-lock"></i> Confirm Password</label>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <div class="password-requirements">
+                    <h6><i class="fas fa-info-circle"></i> Password Requirements:</h6>
+                    <ul>
+                        <li>At least 6 characters</li>
+                        <li>One uppercase letter (A-Z)</li>
+                        <li>One lowercase letter (a-z)</li>
+                        <li>One number (0-9)</li>
+                    </ul>
+                </div>
+
+                <button type="submit" class="btn-auth">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+
+                <div class="auth-link">
+                    Already have an account? <a asp-action="Login" asp-controller="Account">Sign in</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

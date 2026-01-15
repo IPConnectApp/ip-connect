@@ -1,0 +1,37 @@
+.form-check {
+    display: flex;
+    align-items: center;
+    padding-left: 0;
+}
+
+.form-check-input {
+    width: 20px;
+    height: 20px;
+    margin-right: var(--spacing-sm);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.form-check-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(82, 183, 136, 0.25);
+}
+
+.form-check-label {
+    font-size: var(--font-size-base);
+    color: var(--gray-700);
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Additional spacing for login form */
+.auth-body form .form-check {
+    margin-top: var(--spacing-md);
+}

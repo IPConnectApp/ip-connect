@@ -1,0 +1,36 @@
+<nav class="top-navbar">
+    <div class="navbar-container">
+        <!-- Left: Logo -->
+        <div class="navbar-left">
+            <a href="/" class="navbar-logo">
+                <i class="fas fa-comments"></i>
+                <span>IP Connect</span>
+            </a>
+        </div>
+
+        <!-- Right: Notifications & Logout -->
+        <div class="navbar-right">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a href="#" class="navbar-icon" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </a>
+
+                <div class="navbar-user">
+                    <span class="navbar-username">@User.Identity.Name</span>
+                    <form asp-action="Logout" asp-controller="Account" method="post" class="navbar-logout-form">
+                        <button type="submit" class="navbar-logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <a href="/account/login" class="navbar-link">Login</a>
+                <a href="/account/register" class="navbar-link">Register</a>
+            }
+        </div>
+    </div>
+</nav>

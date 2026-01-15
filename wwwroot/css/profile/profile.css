@@ -1,0 +1,301 @@
+/* IP Connect - Profile Dashboard Styles */
+
+/* TOP NAVBAR */
+.top-navbar {
+    background: var(--white);
+    border-bottom: 2px solid var(--gray-200);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: var(--shadow-sm);
+}
+
+.navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-left .navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--primary-color);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+}
+
+.navbar-logo i {
+    font-size: var(--font-size-3xl);
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.navbar-icon {
+    position: relative;
+    color: var(--gray-700);
+    font-size: var(--font-size-xl);
+    text-decoration: none;
+    transition: var(--transition-normal);
+}
+
+.navbar-icon:hover {
+    color: var(--primary-color);
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background: var(--danger);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: var(--font-weight-bold);
+    padding: 2px 6px;
+    border-radius: var(--radius-full);
+}
+
+.navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.navbar-username {
+    font-weight: var(--font-weight-semibold);
+    color: var(--gray-800);
+}
+
+.navbar-logout-form {
+    margin: 0;
+}
+
+.navbar-logout-btn {
+    background: var(--gradient-primary);
+    color: var(--white);
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.navbar-logout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.navbar-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: var(--font-weight-semibold);
+    transition: var(--transition-normal);
+}
+
+.navbar-link:hover {
+    color: var(--primary-dark);
+}
+
+/* PROFILE CONTAINER */
+.profile-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 30px;
+}
+
+/* SIDEBAR */
+.profile-sidebar {
+    width: 300px;
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-lg);
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.profile-picture {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.profile-picture img {
+    width: 150px;
+    height: 150px;
+    border-radius: var(--radius-full);
+    border: 4px solid var(--primary-color);
+    object-fit: cover;
+}
+
+.profile-name {
+    text-align: center;
+    color: var(--gray-900);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-md);
+}
+
+.profile-info {
+    border-top: 2px solid var(--gray-200);
+    border-bottom: 2px solid var(--gray-200);
+    padding: var(--spacing-md) 0;
+    margin-bottom: var(--spacing-md);
+}
+
+.profile-info p {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--gray-700);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--spacing-sm);
+}
+
+.profile-info i {
+    color: var(--primary-color);
+    width: 20px;
+}
+
+.profile-bio {
+    color: var(--gray-700);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+}
+
+/* PROFILE CONTENT */
+.profile-content {
+    flex: 1;
+}
+
+/* TABS */
+.profile-tabs {
+    display: flex;
+    gap: 10px;
+    background: var(--white);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.profile-tab {
+    flex: 1;
+    text-align: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--gray-700);
+    font-weight: var(--font-weight-semibold);
+    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.profile-tab:hover {
+    background: var(--gray-100);
+    color: var(--primary-color);
+}
+
+.profile-tab.active {
+    background: var(--gradient-primary);
+    color: var(--white);
+}
+
+.profile-tab i {
+    font-size: var(--font-size-lg);
+}
+
+/* TAB CONTENT */
+.profile-tab-content {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xxl);
+    box-shadow: var(--shadow-lg);
+    min-height: 500px;
+}
+
+.tab-content-header {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.tab-content-header h1 {
+    color: var(--primary-color);
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+}
+
+/* PLACEHOLDER CONTENT */
+.tab-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--gray-500);
+}
+
+.tab-placeholder i {
+    margin-bottom: var(--spacing-lg);
+    opacity: 0.3;
+}
+
+.tab-placeholder h2 {
+    color: var(--gray-700);
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--spacing-sm);
+}
+
+.tab-placeholder p {
+    color: var(--gray-600);
+    font-size: var(--font-size-lg);
+}
+
+.private-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--danger);
+    color: var(--white);
+    padding: 5px 15px;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    margin-top: var(--spacing-lg);
+}
+
+@media (max-width: 768px) {
+    .profile-container {
+        flex-direction: column;
+    }
+
+    .profile-sidebar {
+        width: 100%;
+        position: static;
+    }
+
+    .profile-tabs {
+        flex-wrap: wrap;
+    }
+
+    .profile-tab {
+        flex: 1 1 45%;
+    }
+}

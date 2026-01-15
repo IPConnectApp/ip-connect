@@ -1,7 +1,10 @@
 using ip_connect.Data;
 using ip_connect.Repositories.Messages;
 using ip_connect.Services.Messages;
+using ip_connect.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using ip_connect.Services.Account;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,14 +13,61 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddControllersWithViews();
+
+// Configure routing for lowercase URLs
+builder.Services.Configure<RouteOptions>(options =>
+{
+    options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = false;
+});
 
 //Add DbContext with SQL Server
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Register Repository and Service
+// Add Identity
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    // Password settings
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+// Provides token generation for account verification and password recovery
+.AddDefaultTokenProviders();
+
+// Configure authentication cookie settings
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    options.SlidingExpiration = true;
+    options.LoginPath = "/account/login";
+
+    // Redirect here if user tries to access forbidden resource
+    options.AccessDeniedPath = "/account/accessdenied";
+
+    // Remove ReturnUrl from query string
+    options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
+    {
+        OnRedirectToLogin = context =>
+        {
+            // Always redirect to login without ReturnUrl
+            context.Response.Redirect("/account/login");
+            return Task.CompletedTask;
+        }
+    };
+});
+
+// Register Repositories
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+
+// Register Services
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 // Add SignalR
 builder.Services.AddSignalR();
@@ -36,11 +86,21 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "profile",
+    pattern: "profile/{username}/{action=Photos}",
+    defaults: new { controller = "Profile" });
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapHub<ip_connect.Hubs.ChatHub>("/chathub");
 
