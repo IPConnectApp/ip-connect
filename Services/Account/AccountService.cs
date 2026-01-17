@@ -1,5 +1,6 @@
 using ip_connect.DTOs.Account;
 using ip_connect.Models;
+using ip_connect.Services.Email;
 using Microsoft.AspNetCore.Identity;
 
 namespace ip_connect.Services.Account
@@ -9,12 +10,16 @@ namespace ip_connect.Services.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
+        private readonly IEmailService _emailService;
+
         public AccountService(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _emailService = emailService;
         }
 
         public async Task<IdentityResult> RegisterAsync(RegisterDto registerDto)
@@ -52,6 +57,19 @@ namespace ip_connect.Services.Account
             // Create user with password (Identity will hash it automatically)
             var result = await _userManager.CreateAsync(user, registerDto.Password);
 
+            //If registration successful, send welcome email
+            if (result.Succeeded)
+            {
+                try
+                {
+                    await _emailService.SendWelcomeEmailAsync(user.Email!, user.UserName!);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to send welcome email: {ex.Message}");
+                }
+            }
+
             return result;
         }
 
@@ -83,7 +101,7 @@ namespace ip_connect.Services.Account
                 // Default error for wrong password
                 return (false, "Invalid email or password");
             }
-            catch (Exception ex)
+            catch
             {
                 return (false, "An unexpected error occurred during login. Please try again");
             }
