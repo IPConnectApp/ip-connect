@@ -1,37 +1,20 @@
 ﻿using ip_connect.Data;
 using ip_connect.Models;
+using ip_connect.Repositories.MessageRepository;
 using Microsoft.EntityFrameworkCore;
 
 namespace ip_connect.Repositories.Messages
 {
-    public class MessageRepository : IMessageRepository
+    public class MessageRepository : Repository<Message>, IMessageRepository
     {
-        private readonly ApplicationDbContext _context;
 
-        public MessageRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        public MessageRepository(ApplicationDbContext context) : base(context) { }
 
-        public async Task<Message> AddAsync(Message message)
-        {
-            _context.Messages.Add(message);
-            await _context.SaveChangesAsync();
-            return message;
-        }
-
-        public async Task<List<Message>> GetAllAsync()
+        public async Task<List<Message>> GetConversationMessagesAsync(int conversationId)
         {
             return await _context.Messages
-                .OrderBy(m => m.Timestamp)
-                .ToListAsync();
-        }
-
-        public async Task<List<Message>> GetRecentAsync(int count)
-        {
-            return await _context.Messages
-                .OrderByDescending(m => m.Timestamp)
-                .Take(count)
+                .Where(m => m.ConversationId == conversationId)
+                .Include(m => m.Sender)
                 .OrderBy(m => m.Timestamp)
                 .ToListAsync();
         }

@@ -3,7 +3,7 @@ using ip_connect.Models;
 using ip_connect.Services.Email;
 using Microsoft.AspNetCore.Identity;
 
-namespace ip_connect.Services.Account
+namespace ip_connect.Services.AccountService
 {
     public class AccountService : IAccountService
     {

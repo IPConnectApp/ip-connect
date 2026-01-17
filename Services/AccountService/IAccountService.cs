@@ -1,7 +1,7 @@
 using ip_connect.DTOs.Account;
 using Microsoft.AspNetCore.Identity;
 
-namespace ip_connect.Services.Account
+namespace ip_connect.Services.AccountService
 {
     public interface IAccountService
     {
