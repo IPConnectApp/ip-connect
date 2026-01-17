@@ -5,6 +5,7 @@ using ip_connect.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using ip_connect.Services.Account;
+using ip_connect.Services.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,6 +69,7 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 // Register Services
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Add SignalR
 builder.Services.AddSignalR();
