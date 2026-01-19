@@ -1,13 +1,9 @@
 ﻿using ip_connect.Models;
 
-namespace ip_connect.Repositories.Messages
+namespace ip_connect.Repositories.MessageRepository
 {
-    public interface IMessageRepository
+    public interface IMessageRepository : IRepository<Message>
     {
-        Task<Message> AddAsync(Message message);
-
-        Task<List<Message>> GetAllAsync();
-
-        Task<List<Message>> GetRecentAsync(int count);
+        Task<List<Message>> GetConversationMessagesAsync(int conversationId);
     }
 }

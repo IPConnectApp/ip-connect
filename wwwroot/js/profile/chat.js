@@ -1,0 +1,527 @@
+// Global variables
+let currentConversationId = null;
+let currentChatUsername = null;
+let currentChatUserId = null;
+let connection = null;
+
+// Initialize SignalR connection
+async function initializeSignalR() {
+    connection = new signalR.HubConnectionBuilder()
+        .withUrl("/chathub")
+        .withAutomaticReconnect()
+        .build();
+
+    // Handle incoming messages
+    connection.on("ReceiveMessage", function (message) {
+        // If we're viewing this conversation
+        if (currentConversationId === message.conversationId) {
+            // Don't add if I'm the sender
+            if (message.senderUsername === window.currentUsername) {
+                return;
+            }
+
+            const isSent = false;
+            addMessageToUI(message, isSent);
+
+            markAsRead(message.conversationId);
+            return;
+        }
+
+        if (message.senderUsername !== window.currentUsername) {
+            loadConversations();
+        }
+    });
+
+    // Start connection
+    try {
+        await connection.start();
+        console.log("SignalR Connected!");
+    } catch (err) {
+        console.error("SignalR Connection Error:", err);
+        setTimeout(initializeSignalR, 5000); // Retry after 5 seconds
+    }
+
+    // Handle reconnection
+    connection.onreconnected(() => {
+        console.log("SignalR Reconnected!");
+        if (currentConversationId) {
+            joinConversation(currentConversationId);
+        }
+    });
+}
+
+// Join all user's conversation groups
+async function joinAllConversations() {
+    try {
+        const response = await fetch('/api/chat/conversations');
+
+        if (!response.ok) {
+            return;
+        }
+
+        const conversations = await response.json();
+
+        // Join each conversation group
+        for (const conv of conversations) {
+            await joinConversation(conv.id);
+            console.log(`Joined conversation group: ${conv.id}`);
+        }
+
+    } catch (error) {
+        console.error('Error joining conversation groups:', error);
+    }
+}
+
+// Join conversation group
+async function joinConversation(conversationId) {
+    if (connection && connection.state === signalR.HubConnectionState.Connected) {
+        try {
+            await connection.invoke("JoinConversation", conversationId);
+            console.log(`Joined conversation ${conversationId}`);
+        } catch (err) {
+            console.error("Error joining conversation:", err);
+        }
+    }
+}
+
+// Leave conversation group
+async function leaveConversation(conversationId) {
+    if (connection && connection.state === signalR.HubConnectionState.Connected) {
+        try {
+            await connection.invoke("LeaveConversation", conversationId);
+        } catch (err) {
+            console.error("Error leaving conversation:", err);
+        }
+    }
+}
+
+// Initialize SignalR when page loads
+initializeSignalR();
+
+// Chat Search Functionality
+const searchInput = document.getElementById('userSearchInput');
+const searchResults = document.getElementById('searchResults');
+
+let searchTimeout;
+
+// Search users as user types
+searchInput.addEventListener('input', function () {
+    const query = this.value.trim();
+
+    clearTimeout(searchTimeout);
+
+    if (query.length === 0) {
+        searchResults.style.display = 'none';
+        return;
+    }
+
+    searchTimeout = setTimeout(() => {
+        searchUsers(query);
+    }, 300);
+});
+
+// Close search results when clicking outside
+document.addEventListener('click', function (e) {
+    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+        searchResults.style.display = 'none';
+    }
+});
+
+// Search users via API
+async function searchUsers(query) {
+    try {
+        const response = await fetch(`/api/chat/search?query=${encodeURIComponent(query)}`);
+
+        if (!response.ok) {
+            throw new Error('Search failed');
+        }
+
+        const users = await response.json();
+        displaySearchResults(users);
+
+    } catch (error) {
+        console.error('Error searching users:', error);
+        searchResults.innerHTML = '<div class="search-error">Failed to search users</div>';
+        searchResults.style.display = 'block';
+    }
+}
+
+// Display search results
+function displaySearchResults(users) {
+    if (users.length === 0) {
+        searchResults.innerHTML = '<div class="search-no-results">No users found</div>';
+        searchResults.style.display = 'block';
+        return;
+    }
+
+    const resultsHtml = users.map(user => `
+        <div class="search-result-item" onclick="startChat('${user.id}', '${user.username}', '${user.profilePictureUrl || '/images/default-avatar.png'}')">
+            <img src="${user.profilePictureUrl || '/images/default-avatar.png'}" 
+                 alt="${user.username}" 
+                 class="search-result-avatar">
+            <div class="search-result-info">
+                <div class="search-result-username">${user.username}</div>
+            </div>
+        </div>
+    `).join('');
+
+    searchResults.innerHTML = resultsHtml;
+    searchResults.style.display = 'block';
+}
+
+// Start chat with selected user
+async function startChat(userId, username, profilePicture) {
+    // Hide search results
+    searchResults.style.display = 'none';
+    searchInput.value = '';
+
+    try {
+        // Call API to get or create conversation
+        const response = await fetch(`/api/chat/start/${userId}`, {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to start conversation');
+        }
+
+        const conversation = await response.json();
+
+        // Store current chat info
+        currentConversationId = conversation.id;
+        currentChatUsername = username;
+        currentChatUserId = userId;
+
+        // Join SignalR conversation group
+        await joinConversation(conversation.id);
+
+        // Open modal
+        openChatModal(username, profilePicture);
+
+        // Load messages
+        await loadMessages(conversation.id);
+
+        // Reload conversations list to show new conversation
+        await loadConversations();
+    } catch (error) {
+        console.error('Error starting chat:', error);
+        alert('Failed to start chat. Please try again.');
+    }
+}
+
+// Open chat modal
+function openChatModal(username, profilePicture) {
+    const modal = document.getElementById('chatModal');
+    const modalUsername = document.getElementById('modalUsername');
+    const modalAvatar = document.getElementById('modalUserAvatar');
+
+    modalUsername.textContent = username;
+    modalAvatar.src = profilePicture;
+    modalAvatar.alt = username;
+
+    modal.style.display = 'flex';
+
+    // Focus on input
+    document.getElementById('messageInput').focus();
+}
+
+// Close chat modal
+async function closeChatModal() {
+    const modal = document.getElementById('chatModal');
+    modal.style.display = 'none';
+
+    // Clear messages
+    document.getElementById('chatMessages').innerHTML = '';
+
+    // Reset current chat info
+    currentConversationId = null;
+    currentChatUsername = null;
+    currentChatUserId = null;
+
+    //Reload conversations to update the list
+    await loadConversations();
+}
+
+// Load messages for conversation
+async function loadMessages(conversationId) {
+    try {
+        const response = await fetch(`/api/chat/messages/${conversationId}`);
+
+        if (!response.ok) {
+            throw new Error('Failed to load messages');
+        }
+
+        const messages = await response.json();
+        displayMessages(messages);
+
+        // Mark as read
+        await markAsRead(conversationId);
+
+    } catch (error) {
+        console.error('Error loading messages:', error);
+        document.getElementById('chatMessages').innerHTML = '<div class="chat-empty">Failed to load messages</div>';
+    }
+}
+
+// Display messages in modal
+function displayMessages(messages) {
+    const messagesContainer = document.getElementById('chatMessages');
+
+    if (messages.length === 0) {
+        messagesContainer.innerHTML = '<div class="chat-empty">No messages yet. Start the conversation!</div>';
+        return;
+    }
+
+    const messagesHtml = messages.map(message => {
+        const isSent = message.senderUsername !== currentChatUsername;
+        const messageClass = isSent ? 'sent' : 'received';
+        const time = new Date(message.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+        return `
+            <div class="chat-message ${messageClass}">
+                <div class="chat-message-bubble">
+                    <div class="chat-message-text">${escapeHtml(message.text)}</div>
+                    <div class="chat-message-time">${time}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    messagesContainer.innerHTML = messagesHtml;
+
+    // Scroll to bottom
+    scrollToBottom();
+}
+
+// Send message
+async function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const text = input.value.trim();
+
+    if (!text || !currentConversationId) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/chat/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                conversationId: currentConversationId,
+                text: text
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to send message');
+        }
+
+        const message = await response.json();
+
+        // Clear input
+        input.value = '';
+
+        // Add message to UI
+        addMessageToUI(message, true);
+
+        // Mark as read after sending (update LastReadAt)
+        await markAsRead(currentConversationId);
+    } catch (error) {
+        console.error('Error sending message:', error);
+        alert('Failed to send message. Please try again.');
+    }
+}
+
+// Add message to UI
+function addMessageToUI(message, isSent) {
+    const messagesContainer = document.getElementById('chatMessages');
+
+    // Remove empty state if exists
+    const emptyState = messagesContainer.querySelector('.chat-empty');
+    if (emptyState) {
+        emptyState.remove();
+    }
+
+    const messageClass = isSent ? 'sent' : 'received';
+    const time = new Date(message.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+    const messageHtml = `
+        <div class="chat-message ${messageClass}">
+            <div class="chat-message-bubble">
+                <div class="chat-message-text">${escapeHtml(message.text)}</div>
+                <div class="chat-message-time">${time}</div>
+            </div>
+        </div>
+    `;
+
+    messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
+    scrollToBottom();
+}
+
+// Mark conversation as read
+async function markAsRead(conversationId) {
+    try {
+        const response = await fetch(`/api/chat/mark-read/${conversationId}`, {
+            method: 'POST'
+        });
+
+        if (response.ok) {
+            console.log(`Successfully marked conversation ${conversationId} as read`);
+        } else {
+            console.error(`Failed to mark as read. Status: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error marking as read:', error);
+    }
+}
+
+// Scroll messages to bottom
+function scrollToBottom() {
+    const messagesContainer = document.getElementById('chatMessages');
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Send message on Enter key
+document.addEventListener('DOMContentLoaded', function () {
+    const messageInput = document.getElementById('messageInput');
+
+    if (messageInput) {
+        messageInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    }
+});
+
+// Close modal on Escape key
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        closeChatModal();
+    }
+});
+
+// Load user's conversations on page load
+async function loadConversations() {
+    try {
+        const response = await fetch('/api/chat/conversations');
+
+        if (!response.ok) {
+            throw new Error('Failed to load conversations');
+        }
+
+        const conversations = await response.json();
+        displayConversations(conversations);
+
+    } catch (error) {
+        console.error('Error loading conversations:', error);
+    }
+}
+
+// Display conversations in the list
+function displayConversations(conversations) {
+    const chatList = document.getElementById('privateChats');
+
+    if (conversations.length === 0) {
+        chatList.innerHTML = '<p class="no-chats-message">No conversations yet. Search for users to start chatting!</p>';
+        return;
+    }
+
+    const conversationsHtml = conversations.map(conv => {
+        const otherUser = conv.otherUserName || 'Unknown User';
+        const profilePic = conv.otherUserProfilePicture || '/images/default-avatar.png';
+        const timeAgo = conv.lastMessageTime ? getTimeAgo(conv.lastMessageTime) : getTimeAgo(conv.createdAt);
+        const lastMessage = conv.lastMessageText || 'No messages yet';
+
+        // Truncate long messages
+        const displayMessage = lastMessage.length > 50
+            ? lastMessage.substring(0, 50) + '...'
+            : lastMessage;
+
+        // Unread badge
+        const unreadBadge = conv.unreadCount > 0
+            ? `<span class="unread-badge">${conv.unreadCount}</span>`
+            : '';
+
+        return `
+            <div class="chat-item" onclick="openConversationFromList('${conv.id}', '${otherUser}', '${profilePic}')">
+                <img src="${profilePic}" alt="${otherUser}" class="chat-avatar">
+                <div class="chat-info">
+                    <div class="chat-username">${otherUser}</div>
+                    <div class="chat-last-message">${escapeHtml(displayMessage)}</div>
+                </div>
+                <div class="chat-meta">
+                    <div class="chat-time">${timeAgo}</div>
+                    ${unreadBadge}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    chatList.innerHTML = conversationsHtml;
+}
+
+// Open conversation from the chat list
+async function openConversationFromList(conversationId, username, profilePicture) {
+    try {
+        // Leave previous conversation if any
+        if (currentConversationId) {
+            await leaveConversation(currentConversationId);
+        }
+
+        // Store current chat info
+        currentConversationId = parseInt(conversationId);
+        currentChatUsername = username;
+
+        // Join SignalR conversation group
+        await joinConversation(currentConversationId);
+
+        // Open modal
+        openChatModal(username, profilePicture);
+
+        // Load messages
+        await loadMessages(currentConversationId);
+
+    } catch (error) {
+        console.error('Error opening conversation:', error);
+        alert('Failed to open chat. Please try again.');
+    }
+}
+
+// Format time ago
+function getTimeAgo(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+
+    return date.toLocaleDateString();
+}
+
+// Load conversations when page loads
+document.addEventListener('DOMContentLoaded', async function () {
+    await loadConversations();
+    await joinAllConversations();
+
+    const messageInput = document.getElementById('messageInput');
+    if (messageInput) {
+        messageInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    }
+});

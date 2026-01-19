@@ -50,7 +50,7 @@ namespace ip_connect.Services.Email
             // Replace placeholders
             var html = template
                 .Replace("{{USERNAME}}", username)
-                .Replace("{{PROFILE_URL}}", "http://localhost:5150/profile");
+                .Replace("{{PROFILE_URL}}", "https://ipconnect-app-brahf2cjgqh5g8af.westeurope-01.azurewebsites.net/profile");
 
             return html;
         }

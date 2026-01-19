@@ -1,24 +1,19 @@
-﻿using ip_connect.Services.Messages;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ip_connect.Hubs
 {
+    [Authorize]
     public class ChatHub : Hub
     {
-        private readonly IMessageService _messageService;
-
-        public ChatHub(IMessageService messageService)
+        public async Task JoinConversation(int conversationId)
         {
-            _messageService = messageService;
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"conversation-{conversationId}");
         }
 
-        public async Task SendMessage(string senderName, string messageText)
+        public async Task LeaveConversation(int conversationId)
         {
-            // Save message using service
-            var message = await _messageService.SendMessageAsync(senderName, messageText);
-
-            // Broadcast to all connected clients
-            await Clients.All.SendAsync("ReceiveMessage", message.SenderName, message.Text, message.Timestamp);
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"conversation-{conversationId}");
         }
     }
 }
