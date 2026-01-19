@@ -28,7 +28,10 @@ namespace ip_connect.Repositories.ConversationRepository
                 .Include(cm => cm.Conversation)
                     .ThenInclude(c => c.Members)
                         .ThenInclude(m => m.User)
+                .Include(cm => cm.Conversation)
+                    .ThenInclude(c => c.Messages)
                 .Select(cm => cm.Conversation)
+                .Where(c => c.Messages.Any())
                 .ToListAsync();
         }
     }

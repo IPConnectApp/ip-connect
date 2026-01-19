@@ -11,6 +11,8 @@ using ip_connect.Services.ConversationService;
 using ip_connect.Services.MessageService;
 using ip_connect.Services.AccountService;
 using ip_connect.Hubs;
+using ip_connect.Services.UserService;
+using ip_connect.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,6 +76,7 @@ builder.Services.AddScoped<IConversationMemberRepository, ConversationMemberRepo
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 // Register Services
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IConversationService, ConversationService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -97,6 +100,9 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthentication();
+
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
 app.UseAuthorization();
 
 app.MapStaticAssets();

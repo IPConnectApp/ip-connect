@@ -1,11 +1,11 @@
-﻿using ip_connect.Models;
+﻿using ip_connect.DTOs.Chat;
 
 namespace ip_connect.Services.MessageService
 {
     public interface IMessageService
     {
-        Task<Message> SendMessageAsync(int conversationId, string senderId, string text);
-        Task<List<Message>> GetConversationMessagesAsync(int conversationId);
+        Task<MessageDto> SendMessageAsync(int conversationId, string senderId, string senderUsername, string text);
+        Task<List<MessageDto>> GetConversationMessagesAsync(int conversationId);
         Task MarkConversationAsReadAsync(int conversationId, string userId);
     }
 }

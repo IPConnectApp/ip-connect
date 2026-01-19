@@ -7,9 +7,62 @@
     <h1>Chats</h1>
 </div>
 
-<div class="tab-placeholder">
-    <i class="fas fa-comments fa-5x"></i>
-    <h2>This is the Chats page</h2>
-    <p>Here you will see your private conversations</p>
-    <span class="private-badge"><i class="fas fa-lock"></i> Private</span>
+<!-- Search Bar -->
+<div class="chat-search-container">
+    <i class="fas fa-search search-icon"></i>
+    <input type="text" id="userSearchInput" class="chat-search-input" placeholder="Search users to start chatting..."
+        autocomplete="off" />
+
+    <div id="searchResults" class="search-results-dropdown" style="display: none;"></div>
 </div>
+
+<!-- Private Chats Section -->
+<div class="chats-section">
+    <h3 class="section-title"><i class="fas fa-comments"></i> Private Chats</h3>
+    <div id="privateChats" class="chat-list">
+        <p class="no-chats-message">No conversations yet. Search for users to start chatting!</p>
+    </div>
+</div>
+
+<!-- Chat Modal -->
+<div id="chatModal" class="chat-modal" style="display: none;">
+    <div class="chat-modal-content">
+        <!-- Modal Header -->
+        <div class="chat-modal-header">
+            <div class="chat-modal-user-info">
+                <img id="modalUserAvatar" src="" alt="" class="chat-modal-avatar">
+                <span id="modalUsername" class="chat-modal-username"></span>
+            </div>
+            <button class="chat-modal-close" onclick="closeChatModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Messages Area -->
+        <div class="chat-modal-messages" id="chatMessages">
+            <!-- Messages will be loaded here -->
+        </div>
+
+        <!-- Input Area -->
+        <div class="chat-modal-input">
+            <input type="text" id="messageInput" class="chat-message-input" placeholder="Type a message..."
+                autocomplete="off">
+            <button class="chat-send-button" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Pass current username to JavaScript -->
+<script>
+    window.currentUsername = '@User.Identity?.Name';
+</script>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile/chat.css" />
+}
+
+@section Scripts {
+    <script src="~/js/profile/chat.js"></script>
+}
