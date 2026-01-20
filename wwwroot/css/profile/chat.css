@@ -406,3 +406,56 @@
 .chat-modal-messages::-webkit-scrollbar-thumb:hover {
     background: var(--gray-500);
 }
+
+/* Emoji Button */
+.chat-emoji-button {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--gray-600);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-xl);
+    transition: var(--transition-normal);
+}
+
+.chat-emoji-button:hover {
+    background: var(--gray-100);
+    color: var(--primary-color);
+}
+
+.chat-emoji-button.active {
+    color: var(--primary-color);
+    background: var(--gray-100);
+}
+
+/* Emoji Picker Container */
+.emoji-picker-container {
+    position: absolute;
+    bottom: 70px;
+    left: 45%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    box-shadow: var(--shadow-xl);
+    border-radius: var(--radius-md);
+}
+
+/* Responsive: On mobile, position at bottom */
+@media (max-width: 768px) {
+    .emoji-picker-container {
+        bottom: 80px;
+        left: 10px;
+        right: 10px;
+        transform: none;
+        width: fit-content;
+    }
+}
+
+emoji-picker {
+    --border-radius: var(--radius-md);
+    --background: var(--white);
+}

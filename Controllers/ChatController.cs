@@ -117,5 +117,18 @@ namespace ip_connect.Controllers
         {
             return User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         }
+
+        // GET: api/chat/unread-count
+        [HttpGet("unread-count")]
+        public async Task<IActionResult> GetUnreadCount()
+        {
+            var userId = GetCurrentUserId();
+            var conversations = await _conversationService.GetUserConversationsAsync(userId);
+
+            // Sum all unread counts
+            var totalUnread = conversations.Sum(c => c.UnreadCount);
+
+            return Ok(new { count = totalUnread });
+        }
     }
 }

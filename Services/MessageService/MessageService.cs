@@ -52,6 +52,11 @@ namespace ip_connect.Services.MessageService
                 .Group($"conversation-{conversationId}")
                 .SendAsync("ReceiveMessage", messageDto);
 
+            // Ensures the conversation appears in their list immediately
+            await _hubContext.Clients
+                .Group($"user-{conversationId}")
+                .SendAsync("NewConversation", new { conversationId });
+
             return messageDto;
         }
 

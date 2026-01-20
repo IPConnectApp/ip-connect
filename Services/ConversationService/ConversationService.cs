@@ -1,7 +1,9 @@
 using ip_connect.DTOs.Chat;
+using ip_connect.Hubs;
 using ip_connect.Models;
 using ip_connect.Repositories.ConversationMemberRepository;
 using ip_connect.Repositories.ConversationRepository;
+using Microsoft.AspNetCore.SignalR;
 
 namespace ip_connect.Services.ConversationService
 {
@@ -9,12 +11,15 @@ namespace ip_connect.Services.ConversationService
     {
         private readonly IConversationRepository _conversationRepository;
         private readonly IConversationMemberRepository _conversationMemberRepository;
+        private readonly IHubContext<ChatHub> _hubContext;
 
         public ConversationService(IConversationRepository conversationRepository,
-                                   IConversationMemberRepository conversationMemberRepository)
+                                   IConversationMemberRepository conversationMemberRepository,
+                                   IHubContext<ChatHub> hubContext)
         {
             _conversationRepository = conversationRepository;
             _conversationMemberRepository = conversationMemberRepository;
+            _hubContext = hubContext;
         }
 
         public async Task<ConversationDto> GetOrCreatePrivateConversationAsync(string user1Id, string user2Id)
@@ -55,6 +60,12 @@ namespace ip_connect.Services.ConversationService
                     UserId = user2Id,
                     JoinedAt = DateTime.UtcNow
                 });
+
+                // Notify the other user about new conversation
+                await _hubContext.Clients
+                       .Group($"user-{user2Id}")
+                       .SendAsync("NewConversationCreated", new { conversationId = conversation.Id });
+
             }
 
             //Map to DTO
