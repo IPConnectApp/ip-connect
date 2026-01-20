@@ -1,54 +1,50 @@
+import { initializeEmojiPicker, closeEmojiPicker } from '../utils/emoji.js';
+
 // Global variables
 let currentConversationId = null;
 let currentChatUsername = null;
 let currentChatUserId = null;
 let connection = null;
 
-// Initialize SignalR connection
-async function initializeSignalR() {
-    connection = new signalR.HubConnectionBuilder()
-        .withUrl("/chathub")
-        .withAutomaticReconnect()
-        .build();
+// Initialize chat-specific SignalR handlers
+async function initializeChatSignalR() {
+    // Wait for global connection to be ready
+    if (!window.globalConnection) {
+        setTimeout(initializeChatSignalR, 100);
+        return;
+    }
 
-    // Handle incoming messages
+    connection = window.globalConnection;
+
+    // Chat-specific message handler
     connection.on("ReceiveMessage", function (message) {
-        // If we're viewing this conversation
+        // If we're viewing this conversation, add message to UI
         if (currentConversationId === message.conversationId) {
-            // Don't add if I'm the sender
             if (message.senderUsername === window.currentUsername) {
                 return;
             }
 
             const isSent = false;
             addMessageToUI(message, isSent);
-
             markAsRead(message.conversationId);
             return;
         }
 
+        // Modal is closed - reload list
         if (message.senderUsername !== window.currentUsername) {
             loadConversations();
         }
     });
 
-    // Start connection
-    try {
-        await connection.start();
-        console.log("SignalR Connected!");
-    } catch (err) {
-        console.error("SignalR Connection Error:", err);
-        setTimeout(initializeSignalR, 5000); // Retry after 5 seconds
-    }
-
-    // Handle reconnection
-    connection.onreconnected(() => {
-        console.log("SignalR Reconnected!");
-        if (currentConversationId) {
-            joinConversation(currentConversationId);
-        }
+    // Chat-specific new conversation handler
+    connection.on("NewConversationCreated", function (data) {
+        loadConversations();
+        joinConversation(data.conversationId);
     });
 }
+
+// Initialize chat SignalR
+initializeChatSignalR();
 
 // Join all user's conversation groups
 async function joinAllConversations() {
@@ -94,9 +90,6 @@ async function leaveConversation(conversationId) {
         }
     }
 }
-
-// Initialize SignalR when page loads
-initializeSignalR();
 
 // Chat Search Functionality
 const searchInput = document.getElementById('userSearchInput');
@@ -221,8 +214,22 @@ function openChatModal(username, profilePicture) {
 
     modal.style.display = 'flex';
 
+    // Initialize emoji picker
+    setTimeout(() => {
+        initializeEmojiPicker();
+    }, 100);
+
     // Focus on input
     document.getElementById('messageInput').focus();
+
+    // Close modal when clicking on backdrop (outside modal content)
+    modal.addEventListener('click', function handleModalClick(e) {
+        if (e.target === modal) {
+            closeChatModal();
+            // Remove listener after closing
+            modal.removeEventListener('click', handleModalClick);
+        }
+    });
 }
 
 // Close chat modal
@@ -240,6 +247,11 @@ async function closeChatModal() {
 
     //Reload conversations to update the list
     await loadConversations();
+
+    // Update profile tab badge
+    if (typeof updateProfileUnreadBadge === 'function') {
+        updateProfileUnreadBadge();
+    }
 }
 
 // Load messages for conversation
@@ -293,14 +305,20 @@ function displayMessages(messages) {
     scrollToBottom();
 }
 
+let isSending = false;
+
 // Send message
 async function sendMessage() {
+    if (isSending) return;
+
     const input = document.getElementById('messageInput');
     const text = input.value.trim();
 
     if (!text || !currentConversationId) {
         return;
     }
+
+    isSending = true;
 
     try {
         const response = await fetch('/api/chat/send', {
@@ -331,6 +349,8 @@ async function sendMessage() {
     } catch (error) {
         console.error('Error sending message:', error);
         alert('Failed to send message. Please try again.');
+    } finally {
+        isSending = false;
     }
 }
 
@@ -406,6 +426,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // Close modal on Escape key
 document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
+        e.preventDefault();
         closeChatModal();
     }
 });
@@ -525,3 +546,16 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
 });
+
+// Reload conversations when window gets focus
+window.addEventListener('focus', function () {
+    console.log('Window focused - reloading conversations');
+    loadConversations();
+    joinAllConversations();
+});
+
+// Export functions to window for onclick handlers and global access
+window.openConversationFromList = openConversationFromList;
+window.startChat = startChat;
+window.closeChatModal = closeChatModal;
+window.sendMessage = sendMessage;

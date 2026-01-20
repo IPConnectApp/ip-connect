@@ -20,6 +20,8 @@
 
     <!-- SignalR Client Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script src="~/js/global-signalr.js"></script>
+    <script src="~/js/profile/profile-badge.js"></script>
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -61,6 +63,7 @@
                 {
                     <a href="/profile/@username/chats" class="profile-tab @(currentTab == "Chats" ? "active" : "")">
                         <i class="fas fa-comments"></i> Chats
+                        <span id="profileUnreadBadge" class="profile-tab-badge" style="display: none;">0</span>
                     </a>
                     <a href="/profile/@username/settings" class="profile-tab @(currentTab == "Settings" ? "active" : "")">
                         <i class="fas fa-cog"></i> Settings

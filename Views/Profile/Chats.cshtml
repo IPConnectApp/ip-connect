@@ -45,11 +45,19 @@
 
         <!-- Input Area -->
         <div class="chat-modal-input">
+            <button class="chat-emoji-button" id="emojiButton" type="button">
+                <i class="far fa-smile"></i>
+            </button>
             <input type="text" id="messageInput" class="chat-message-input" placeholder="Type a message..."
                 autocomplete="off">
             <button class="chat-send-button" onclick="sendMessage()">
                 <i class="fas fa-paper-plane"></i>
             </button>
+        </div>
+
+        <!-- Emoji Picker Container (hidden by default) -->
+        <div id="emojiPickerContainer" class="emoji-picker-container" style="display: none;">
+            <emoji-picker></emoji-picker>
         </div>
     </div>
 </div>
@@ -64,5 +72,8 @@
 }
 
 @section Scripts {
-    <script src="~/js/profile/chat.js"></script>
+    <script type="module">
+        import 'https://cdn.jsdelivr.net/npm/emoji-picker-element@1.21.3/index.js';
+    </script>
+    <script type="module" src="/js/profile/chat.js"></script>
 }
