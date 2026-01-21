@@ -6,5 +6,6 @@ namespace ip_connect.Repositories.ConversationMemberRepository
     {
         Task<ConversationMember?> GetMembershipAsync(int conversationId, string userId);
         Task UpdateLastReadAtAsync(int conversationId, string userId);
+        Task<List<ConversationMember>> GetConversationMembersAsync(int conversationId);
     }
 }

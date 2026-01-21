@@ -1,4 +1,4 @@
-import { initializeEmojiPicker, closeEmojiPicker } from '../utils/emoji.js';
+import { initializeEmojiPicker } from '../utils/emoji.js';
 
 // Global variables
 let currentConversationId = null;
@@ -9,12 +9,22 @@ let connection = null;
 // Initialize chat-specific SignalR handlers
 async function initializeChatSignalR() {
     // Wait for global connection to be ready
+    let attempts = 0;
+    while (!window.globalConnection && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+    }
+
     if (!window.globalConnection) {
-        setTimeout(initializeChatSignalR, 100);
         return;
     }
 
     connection = window.globalConnection;
+
+    // Remove any existing handlers to prevent duplicates
+    connection.off("ReceiveMessage");
+    connection.off("NewMessageNotification");
+    connection.off("NewConversationCreated");
 
     // Chat-specific message handler
     connection.on("ReceiveMessage", function (message) {
@@ -30,8 +40,17 @@ async function initializeChatSignalR() {
             return;
         }
 
-        // Modal is closed - reload list
-        if (message.senderUsername !== window.currentUsername) {
+        // Modal is closed - reload list and update badge
+        loadConversations();
+
+        if (typeof updateProfileUnreadBadge === 'function') {
+            updateProfileUnreadBadge();
+        }
+    });
+
+    // Badge notification handler for chat list updates
+    connection.on("NewMessageNotification", function (message) {
+        if (!currentConversationId || currentConversationId !== message.conversationId) {
             loadConversations();
         }
     });
@@ -73,10 +92,11 @@ async function joinConversation(conversationId) {
     if (connection && connection.state === signalR.HubConnectionState.Connected) {
         try {
             await connection.invoke("JoinConversation", conversationId);
-            console.log(`Joined conversation ${conversationId}`);
         } catch (err) {
             console.error("Error joining conversation:", err);
         }
+    } else {
+        console.error(`Cannot join conversation ${conversationId} - connection not ready. State:`, connection?.state);
     }
 }
 
@@ -239,6 +259,11 @@ async function closeChatModal() {
 
     // Clear messages
     document.getElementById('chatMessages').innerHTML = '';
+
+    if (currentConversationId) {
+        await markAsRead(currentConversationId);
+        await leaveConversation(currentConversationId);
+    }
 
     // Reset current chat info
     currentConversationId = null;
@@ -534,6 +559,8 @@ function getTimeAgo(dateString) {
 
 // Load conversations when page loads
 document.addEventListener('DOMContentLoaded', async function () {
+    await initializeChatSignalR();
+
     await loadConversations();
     await joinAllConversations();
 
@@ -549,7 +576,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 // Reload conversations when window gets focus
 window.addEventListener('focus', function () {
-    console.log('Window focused - reloading conversations');
     loadConversations();
     joinAllConversations();
 });
