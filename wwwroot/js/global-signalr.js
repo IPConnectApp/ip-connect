@@ -1,43 +1,49 @@
 // Global SignalR connection for the entire site
-let globalConnection = null;
+window.globalConnection = null;
 
 async function initializeGlobalSignalR() {
-    if (globalConnection) {
+    if (window.globalConnection) {
         return;
     }
 
-    globalConnection = new signalR.HubConnectionBuilder()
+    const connection = new signalR.HubConnectionBuilder()
         .withUrl("/chathub")
         .withAutomaticReconnect()
         .build();
 
     // Listen for new messages globally
-    globalConnection.on("ReceiveMessage", function(message) {
-        if (typeof updateProfileUnreadBadge === 'function') {
-            updateProfileUnreadBadge();
+    connection.on("NewMessageNotification", function(message) {
+        //Update badge on ALL pages (Photos, Friends, Settings, etc.)
+        if (typeof window.updateProfileUnreadBadge === 'function') {
+            window.updateProfileUnreadBadge();
         }
     });
 
     // Listen for new conversations
-    globalConnection.on("NewConversationCreated", function(data) {
-        if (typeof updateProfileUnreadBadge === 'function') {
-            updateProfileUnreadBadge();
+    connection.on("NewConversationCreated", function(data) {
+        //Update badge when new conversation created
+        if (typeof window.updateProfileUnreadBadge === 'function') {
+            window.updateProfileUnreadBadge();
         }
     });
 
     // Start connection
     try {
-        await globalConnection.start();
+        await connection.start();
+        // Export AFTER successful connection
+        window.globalConnection = connection;
+        
     } catch (err) {
         console.error("Global SignalR Connection Error:", err);
         setTimeout(initializeGlobalSignalR, 5000);
     }
 
     // Log connection errors
-    globalConnection.onclose((error) => {
+    connection.onclose((error) => {
         if (error) {
             console.error("Global SignalR Connection Closed:", error);
         }
+        window.globalConnection = null;
     });
 }
 
@@ -45,6 +51,3 @@ async function initializeGlobalSignalR() {
 document.addEventListener('DOMContentLoaded', function() {
     initializeGlobalSignalR();
 });
-
-// Export for use in other scripts
-window.globalConnection = globalConnection;

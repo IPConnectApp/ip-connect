@@ -47,15 +47,21 @@ namespace ip_connect.Services.MessageService
                 Timestamp = message.Timestamp
             };
 
-            //Broadcast message via SignalR to all users in this conversation
+            //Broadcast to conversation group (for users on Chats page with modal open)
             await _hubContext.Clients
                 .Group($"conversation-{conversationId}")
                 .SendAsync("ReceiveMessage", messageDto);
 
-            // Ensures the conversation appears in their list immediately
-            await _hubContext.Clients
-                .Group($"user-{conversationId}")
-                .SendAsync("NewConversation", new { conversationId });
+            //Get all members and broadcast to their personal groups (for users on ANY page)
+            var members = await _conversationMemberRepository.GetConversationMembersAsync(conversationId);
+
+            foreach (var member in members)
+            {
+                //Send ReceiveMessage to everyone (including sender for badge updates)
+                await _hubContext.Clients
+                    .Group($"user-{member.UserId}")
+                    .SendAsync("NewMessageNotification", messageDto);
+            }
 
             return messageDto;
         }

@@ -25,5 +25,12 @@ namespace ip_connect.Repositories.ConversationMemberRepository
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<List<ConversationMember>> GetConversationMembersAsync(int conversationId)
+        {
+            return await _context.ConversationMembers
+                .Where(cm => cm.ConversationId == conversationId)
+                .ToListAsync();
+        }
     }
 }
