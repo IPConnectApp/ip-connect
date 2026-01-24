@@ -2,7 +2,7 @@
     var username = ViewData["Username"]?.ToString() ?? User.Identity?.Name ?? "";
     var currentTab = ViewData["CurrentTab"]?.ToString() ?? "Photos";
     var isOwnProfile = User.Identity?.Name == username;
-    var profilePicUrl = ViewData["ProfilePictureUrl"]?.ToString() ?? "/images/default-avatar.png";
+    var profilePicUrl = ViewData["ProfilePictureUrl"]?.ToString() ?? "/images/default-avatar.jpg";
 }
 
 <!DOCTYPE html>

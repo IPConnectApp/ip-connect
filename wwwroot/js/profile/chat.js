@@ -5,6 +5,8 @@ let currentConversationId = null;
 let currentChatUsername = null;
 let currentChatUserId = null;
 let connection = null;
+let typingTimeout = null;
+let typingUsers = {};
 
 // Initialize chat-specific SignalR handlers
 async function initializeChatSignalR() {
@@ -59,6 +61,29 @@ async function initializeChatSignalR() {
     connection.on("NewConversationCreated", function (data) {
         loadConversations();
         joinConversation(data.conversationId);
+    });
+
+    connection.on("UserTyping", function (data) {
+        if (data.conversationId === currentConversationId && data.username !== window.currentUsername) {
+            showTypingIndicator(data.username);
+        }
+
+        // Track typing for chat list
+        if (data.username !== window.currentUsername) {
+            typingUsers[data.conversationId] = data.username;
+            updateChatListTyping(data.conversationId, data.username);
+        }
+    });
+
+    connection.on("UserStoppedTyping", function (data) {
+        // Hide modal typing indicator
+        if (data.conversationId === currentConversationId) {
+            hideTypingIndicator();
+        }
+
+        // Remove from typing list
+        delete typingUsers[data.conversationId];
+        updateChatListTyping(data.conversationId, null);
     });
 }
 
@@ -168,8 +193,8 @@ function displaySearchResults(users) {
     }
 
     const resultsHtml = users.map(user => `
-        <div class="search-result-item" onclick="startChat('${user.id}', '${user.username}', '${user.profilePictureUrl || '/images/default-avatar.png'}')">
-            <img src="${user.profilePictureUrl || '/images/default-avatar.png'}" 
+        <div class="search-result-item" onclick="startChat('${user.id}', '${user.username}', '${user.profilePictureUrl || '/images/default-avatar.jpg'}')">
+            <img src="${user.profilePictureUrl || '/images/default-avatar.jpg'}" 
                  alt="${user.username}" 
                  class="search-result-avatar">
             <div class="search-result-info">
@@ -312,7 +337,26 @@ function displayMessages(messages) {
     const messagesHtml = messages.map(message => {
         const isSent = message.senderUsername !== currentChatUsername;
         const messageClass = isSent ? 'sent' : 'received';
-        const time = new Date(message.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+        //Parse as UTC and format with date + 24h time
+        const timestamp = message.timestamp.endsWith('Z') ? message.timestamp : message.timestamp + 'Z';
+        const messageDate = new Date(timestamp);
+        const now = new Date();
+        const isToday = messageDate.toDateString() === now.toDateString();
+        
+        const time = isToday 
+            ? messageDate.toLocaleString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false  //
+              })
+            : messageDate.toLocaleString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false  //
+              });
 
         return `
             <div class="chat-message ${messageClass}">
@@ -390,7 +434,26 @@ function addMessageToUI(message, isSent) {
     }
 
     const messageClass = isSent ? 'sent' : 'received';
-    const time = new Date(message.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+    //Parse as UTC and format with 24h time
+    const timestamp = message.timestamp.endsWith('Z') ? message.timestamp : message.timestamp + 'Z';
+    const messageDate = new Date(timestamp);
+    const now = new Date();
+    const isToday = messageDate.toDateString() === now.toDateString();
+    
+    const time = isToday 
+        ? messageDate.toLocaleString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: false
+          })
+        : messageDate.toLocaleString('en-US', { 
+            month: 'short', 
+            day: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: false
+          });
 
     const messageHtml = `
         <div class="chat-message ${messageClass}">
@@ -484,8 +547,13 @@ function displayConversations(conversations) {
 
     const conversationsHtml = conversations.map(conv => {
         const otherUser = conv.otherUserName || 'Unknown User';
-        const profilePic = conv.otherUserProfilePicture || '/images/default-avatar.png';
-        const timeAgo = conv.lastMessageTime ? getTimeAgo(conv.lastMessageTime) : getTimeAgo(conv.createdAt);
+        const profilePic = conv.otherUserProfilePicture || '/images/default-avatar.jpg';
+
+        const timeToDisplay = conv.lastMessageTime || conv.createdAt;
+
+        const timestamp = timeToDisplay.endsWith('Z') ? timeToDisplay : timeToDisplay + 'Z';
+        const timeAgo = getTimeAgo(timestamp);
+
         const lastMessage = conv.lastMessageText || 'No messages yet';
 
         // Truncate long messages
@@ -557,6 +625,55 @@ function getTimeAgo(dateString) {
     return date.toLocaleDateString();
 }
 
+function showTypingIndicator(username) {
+    const indicator = document.getElementById('typingIndicator');
+    const usernameSpan = document.getElementById('typingUsername');
+
+    if (indicator && usernameSpan) {
+        usernameSpan.textContent = username;
+        indicator.style.display = 'flex';
+        scrollToBottom();
+    }
+}
+
+function hideTypingIndicator() {
+    const indicator = document.getElementById('typingIndicator');
+    if (indicator) {
+        indicator.style.display = 'none';
+    }
+}
+
+function notifyTyping() {
+    if (connection && currentConversationId) {
+        connection.invoke("UserTyping", currentConversationId, window.currentUsername)
+            .catch(err => console.error('Error sending typing notification:', err));
+    }
+}
+
+function notifyStoppedTyping() {
+    if (connection && currentConversationId) {
+        connection.invoke("UserStoppedTyping", currentConversationId, window.currentUsername)
+            .catch(err => console.error('Error sending stopped typing notification:', err));
+    }
+}
+
+function updateChatListTyping(conversationId, username) {
+    const chatItem = document.querySelector(`[onclick*="openConversationFromList('${conversationId}'"]`);
+
+    if (chatItem) {
+        const lastMessageElement = chatItem.querySelector('.chat-last-message');
+
+        if (lastMessageElement) {
+            if (username) {
+                lastMessageElement.innerHTML = `<em style="color: #008080;">${escapeHtml(username)} is typing...</em>`;
+            } else {
+                // Reload conversations to restore original last message
+                loadConversations();
+            }
+        }
+    }
+}
+
 // Load conversations when page loads
 document.addEventListener('DOMContentLoaded', async function () {
     await initializeChatSignalR();
@@ -566,9 +683,20 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     const messageInput = document.getElementById('messageInput');
     if (messageInput) {
+        messageInput.addEventListener('input', function () {
+            notifyTyping();
+
+            clearTimeout(typingTimeout);
+
+            typingTimeout = setTimeout(() => {
+                notifyStoppedTyping();
+            }, 2000);
+        });
+
         messageInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 sendMessage();
+                notifyStoppedTyping();
             }
         });
     }

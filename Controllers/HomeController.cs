@@ -1,16 +1,34 @@
+using ip_connect.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ip_connect.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public HomeController(UserManager<ApplicationUser> userManager)
+        {
+            _userManager = userManager;
+        }
+
+        public async Task<IActionResult> Index()
         {
             // If logged in, redirect to user's profile
             if (User.Identity?.IsAuthenticated == true)
             {
                 var username = User.Identity.Name;
-                return RedirectToAction("Photos", "Profile", new { username });
+                
+                if (string.IsNullOrEmpty(username))
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                var user = await _userManager.FindByNameAsync(username);
+                var correctUsername = user?.UserName ?? username;
+                
+                return RedirectToAction("Chats", "Profile", new { username = correctUsername });
             }
 
             // If not logged in, redirect to login
