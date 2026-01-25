@@ -85,6 +85,12 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 // Add SignalR
 builder.Services.AddSignalR();
 
+// Don't lowercase URLs
+builder.Services.AddRouting(options =>
+{
+    options.LowercaseUrls = false;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

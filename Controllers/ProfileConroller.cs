@@ -33,7 +33,7 @@ namespace ip_connect.Controllers
 
             ViewData["Username"] = username;
             ViewData["CurrentTab"] = "Photos";
-            ViewData["ProfilePictureUrl"] = user.ProfilePictureUrl ?? "/images/default-avatar.png";
+            ViewData["ProfilePictureUrl"] = user.ProfilePictureUrl ?? "/images/default-avatar.jpg";
             return View();
         }
 
@@ -47,7 +47,7 @@ namespace ip_connect.Controllers
 
             ViewData["Username"] = username;
             ViewData["CurrentTab"] = "Friends";
-            ViewData["ProfilePictureUrl"] = user.ProfilePictureUrl ?? "/images/default-avatar.png";
+            ViewData["ProfilePictureUrl"] = user.ProfilePictureUrl ?? "/images/default-avatar.jpg";
             return View();
         }
 
@@ -67,7 +67,7 @@ namespace ip_connect.Controllers
 
             ViewData["Username"] = username;
             ViewData["CurrentTab"] = "Chats";
-            ViewData["ProfilePictureUrl"] = user.ProfilePictureUrl ?? "/images/default-avatar.png";
+            ViewData["ProfilePictureUrl"] = user.ProfilePictureUrl ?? "/images/default-avatar.jpg";
             return View();
         }
 
@@ -87,7 +87,7 @@ namespace ip_connect.Controllers
 
             ViewData["Username"] = username;
             ViewData["CurrentTab"] = "Settings";
-            ViewData["ProfilePictureUrl"] = user.ProfilePictureUrl ?? "/images/default-avatar.png";
+            ViewData["ProfilePictureUrl"] = user.ProfilePictureUrl ?? "/images/default-avatar.jpg";
             return View();
         }
     }

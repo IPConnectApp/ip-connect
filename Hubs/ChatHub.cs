@@ -28,5 +28,17 @@ namespace ip_connect.Hubs
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"conversation-{conversationId}");
         }
+
+        public async Task UserTyping(int conversationId, string username)
+        {
+            await Clients.OthersInGroup($"conversation-{conversationId}")
+                .SendAsync("UserTyping", new { conversationId, username });
+        }
+
+        public async Task UserStoppedTyping(int conversationId, string username)
+        {
+            await Clients.OthersInGroup($"conversation-{conversationId}")
+                .SendAsync("UserStoppedTyping", new { conversationId, username });
+        }
     }
 }
