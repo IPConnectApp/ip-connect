@@ -12,10 +12,33 @@
         <div class="navbar-right">
             @if (User.Identity?.IsAuthenticated == true)
             {
-                <a href="#" class="navbar-icon" title="Notifications">
-                    <i class="fas fa-bell"></i>
-                    <span class="notification-badge">3</span>
-                </a>
+                <!-- Notification Bell with Dropdown -->
+                <div class="navbar-notification-container">
+                    <a href="#" class="navbar-icon" id="notificationBell" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                    </a>
+
+                    <!-- Notification Dropdown -->
+                    <div class="notification-dropdown" id="notificationDropdown" style="display: none;">
+                        <div class="notification-dropdown-header">
+                            <h4>Notifications</h4>
+                            <button class="btn-mark-all-read" id="markAllReadBtn">
+                                <i class="fas fa-check-double"></i> Mark all read
+                            </button>
+                        </div>
+
+                        <div class="notification-dropdown-list" id="notificationList">
+                            <div class="notification-loading">
+                                <i class="fas fa-spinner fa-spin"></i> Loading...
+                            </div>
+                        </div>
+
+                        <div class="notification-dropdown-footer">
+                            <span class="notification-footer-text">You're all caught up!</span>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="navbar-user">
                     <span class="navbar-username">@User.Identity.Name</span>

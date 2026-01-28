@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using ip_connect.Models;
+using ip_connect.Services.FriendshipService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +12,12 @@ namespace ip_connect.Controllers
     public class ProfileController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IFriendshipService _friendshipService;
 
-        public ProfileController(UserManager<ApplicationUser> userManager)
+        public ProfileController(UserManager<ApplicationUser> userManager, IFriendshipService friendshipService)
         {
             _userManager = userManager;
+            _friendshipService = friendshipService;
         }
 
         // /profile → Redirects to logged-in user's profile
@@ -31,9 +35,26 @@ namespace ip_connect.Controllers
             if (user == null)
                 return NotFound();
 
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(currentUserId))
+                return Unauthorized();
+
+            var isOwnProfile = currentUserId == user.Id;
+            var areFriends = false;
+
+            if (!isOwnProfile)
+            {
+                areFriends = await _friendshipService.AreFriendsAsync(currentUserId, user.Id);
+            }
+
             ViewData["Username"] = username;
             ViewData["CurrentTab"] = "Photos";
             ViewData["ProfilePictureUrl"] = user.ProfilePictureUrl ?? "/images/default-avatar.jpg";
+            ViewData["IsOwnProfile"] = isOwnProfile;
+            ViewData["AreFriends"] = areFriends;
+            ViewData["ProfileUserId"] = user.Id;
+
             return View();
         }
 
@@ -45,9 +66,26 @@ namespace ip_connect.Controllers
             if (user == null)
                 return NotFound();
 
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(currentUserId))
+                return Unauthorized();
+
+            var isOwnProfile = currentUserId == user.Id;
+            var areFriends = false;
+
+            if (!isOwnProfile)
+            {
+                areFriends = await _friendshipService.AreFriendsAsync(currentUserId, user.Id);
+            }
+
             ViewData["Username"] = username;
             ViewData["CurrentTab"] = "Friends";
             ViewData["ProfilePictureUrl"] = user.ProfilePictureUrl ?? "/images/default-avatar.jpg";
+            ViewData["IsOwnProfile"] = isOwnProfile;
+            ViewData["AreFriends"] = areFriends;
+            ViewData["ProfileUserId"] = user.Id;
+
             return View();
         }
 
@@ -59,11 +97,11 @@ namespace ip_connect.Controllers
             if (user == null)
                 return NotFound();
 
-            // Check if viewing own profile
-            if (User.Identity?.Name != username)
-            {
-                return RedirectToAction("Photos", new { username });
-            }
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Only the owner can view settings
+            if (currentUserId != user.Id)
+                return Forbid();
 
             ViewData["Username"] = username;
             ViewData["CurrentTab"] = "Chats";
@@ -79,11 +117,11 @@ namespace ip_connect.Controllers
             if (user == null)
                 return NotFound();
 
-            // Check if viewing own profile
-            if (User.Identity?.Name != username)
-            {
-                return RedirectToAction("Photos", new { username });
-            }
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Only the owner can view settings
+            if (currentUserId != user.Id)
+                return Forbid();
 
             ViewData["Username"] = username;
             ViewData["CurrentTab"] = "Settings";
