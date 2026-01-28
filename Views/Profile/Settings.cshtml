@@ -1,15 +1,117 @@
+@model ip_connect.Dtos.UserProfile.UserProfileDto
 @{
     ViewData["Title"] = "Settings";
     Layout = "_ProfileLayout";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile/settings.css" />
+
+    <style>
+        .alert-fade-out {
+            opacity: 0;
+            transition: opacity 1s ease-out;
+        }
+    </style>
+}
+
 <div class="tab-content-header">
-    <h1>Settings - test</h1>
+    <h1>Settings</h1>
 </div>
 
-<div class="tab-placeholder">
-    <i class="fas fa-cog fa-5x"></i>
-    <h2>This is the Settings page</h2>
-    <p>Here you will manage your account settings</p>
-    <span class="private-badge"><i class="fas fa-lock"></i> Private</span>
+<div class="settings-container">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div id="successAlert" class="alert alert-success">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="settings-card">
+        <h3><i class="fas fa-camera"></i> Profile Picture</h3>
+        <form asp-action="UpdateAvatar" asp-controller="Profile" method="post" enctype="multipart/form-data">
+            <div class="avatar-section">
+                <img src="@(Model.ProfilePictureUrl ?? "/images/default-avatar.jpg")" class="current-avatar" />
+
+                <div>
+                    <label for="avatarFile" class="file-upload-btn">
+                        <i class="fas fa-upload"></i> Change Photo
+                    </label>
+                    <input type="file" id="avatarFile" name="avatarFile" accept="image/*" onchange="this.form.submit()" />
+                    <p class="text-muted mt-2" style="font-size: 0.9em;">Click to upload (Auto-save)</p>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="settings-card">
+        <h3><i class="fas fa-user-edit"></i> Personal Information</h3>
+
+        <form asp-action="UpdateInfo" asp-controller="Profile" method="post">
+            <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="Id" />
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input asp-for="DisplayName" class="form-control" placeholder="Display Name">
+                        <label asp-for="DisplayName">Display Name</label>
+                        <span asp-validation-for="DisplayName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <select asp-for="Gender" class="form-control">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <label asp-for="Gender">Gender</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="BirthDate" type="date" class="form-control" placeholder="Birth Date">
+                <label asp-for="BirthDate">Birth Date</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <textarea asp-for="Bio" class="form-control" style="height: 100px" placeholder="Bio"></textarea>
+                <label asp-for="Bio">Bio (Tell us about yourself)</label>
+                <span asp-validation-for="Bio" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn-save-settings">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+        </form>
+    </div>
 </div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var alertBox = document.getElementById("successAlert");
+
+
+            if (alertBox) {
+
+                setTimeout(function() {
+
+                    alertBox.style.transition = "opacity 0.5s ease";
+                    alertBox.style.opacity = "0";
+
+
+                    setTimeout(function() {
+                        alertBox.style.display = "none";
+                    }, 500);
+                }, 10000);
+            }
+        });
+    </script>
+}

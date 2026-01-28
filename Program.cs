@@ -1,18 +1,20 @@
 using ip_connect.Data;
-using ip_connect.Repositories.Messages;
-using ip_connect.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using ip_connect.Services.Email;
-using ip_connect.Repositories.ConversationRepository;
-using ip_connect.Repositories.ConversationMemberRepository;
-using ip_connect.Repositories.MessageRepository;
-using ip_connect.Services.ConversationService;
-using ip_connect.Services.MessageService;
-using ip_connect.Services.AccountService;
 using ip_connect.Hubs;
-using ip_connect.Services.UserService;
 using ip_connect.Middleware;
+using ip_connect.Models;
+using ip_connect.Repositories.ConversationMemberRepository;
+using ip_connect.Repositories.ConversationRepository;
+using ip_connect.Repositories.MessageRepository;
+using ip_connect.Repositories.Messages;
+using ip_connect.Repositories.UserProfileRepository;
+using ip_connect.Services.AccountService;
+using ip_connect.Services.ConversationService;
+using ip_connect.Services.Email;
+using ip_connect.Services.MessageService;
+using ip_connect.Services.UserProfileService;
+using ip_connect.Services.UserService;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,6 +76,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
 builder.Services.AddScoped<IConversationMemberRepository, ConversationMemberRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 
 // Register Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -81,6 +84,7 @@ builder.Services.AddScoped<IConversationService, ConversationService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 
 // Add SignalR
 builder.Services.AddSignalR();

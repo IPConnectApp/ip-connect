@@ -9,5 +9,7 @@ namespace ip_connect.Models
         public string? ProfilePictureUrl { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public UserProfile? Profile { get; set; }
     }
 }
