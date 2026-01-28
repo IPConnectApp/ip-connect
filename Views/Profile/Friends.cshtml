@@ -1,14 +1,41 @@
 @{
     ViewData["Title"] = "Friends";
     Layout = "_ProfileLayout";
+    var isOwnProfile = ViewData["IsOwnProfile"] as bool? ?? false;
+    var areFriends = ViewData["AreFriends"] as bool? ?? false;
+    var profileUserId = ViewData["ProfileUserId"]?.ToString() ?? "";
 }
 
-<div class="tab-content-header">
-    <h1>Friends</h1>
-</div>
+@if (isOwnProfile || areFriends)
+{
+    <div class="friends-container">
+        <div id="friendsContent">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i> Loading friends...
+            </div>
+        </div>
+        <input type="hidden" id="profileUserId" value="@profileUserId" />
+        <input type="hidden" id="isOwnProfile" value="@isOwnProfile.ToString().ToLower()" />
+    </div>
+}
+else
+{
+    <div class="restricted-content">
+        <div class="restricted-card">
+            <i class="fas fa-lock"></i>
+            <h3>This Content is Private</h3>
+            <p>You need to be friends with @ViewData["Username"] to view their friends list.</p>
+            <button class="btn-add-friend-large" onclick="sendFriendRequest('@profileUserId')">
+                <i class="fas fa-user-plus"></i> Add Friend
+            </button>
+        </div>
+    </div>
+}
 
-<div class="tab-placeholder">
-    <i class="fas fa-user-friends fa-5x"></i>
-    <h2>This is the Friends page</h2>
-    <p>Here you will see your friends list</p>
-</div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile/friends.css" />
+}
+
+@section Scripts {
+    <script src="~/js/profile/friends.js"></script>
+}

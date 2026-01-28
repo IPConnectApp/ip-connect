@@ -1,0 +1,205 @@
+/* Friends Container - fits inside profile-tab-content */
+.friends-container {
+    width: 100%;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--gray-500);
+    font-size: var(--font-size-lg);
+}
+
+.loading-spinner i {
+    margin-right: var(--spacing-sm);
+}
+
+/* Friends Grid */
+.friends-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+/* Friend Card */
+.friend-card {
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    text-align: center;
+    transition: var(--transition-normal);
+    cursor: pointer;
+}
+
+.friend-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-color);
+}
+
+.friend-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-full);
+    margin: 0 auto var(--spacing-md);
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+}
+
+.friend-name {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--gray-900);
+    margin-bottom: var(--spacing-xs);
+}
+
+.friend-since {
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
+    margin-bottom: var(--spacing-md);
+}
+
+.friend-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    justify-content: center;
+}
+
+.btn-view-profile,
+.btn-message {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: var(--transition-normal);
+    border: none;
+    flex: 1;
+}
+
+.btn-view-profile {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.btn-view-profile:hover {
+    background: var(--primary-dark);
+}
+
+.btn-message {
+    background: var(--gray-200);
+    color: var(--gray-800);
+}
+
+.btn-message:hover {
+    background: var(--gray-300);
+}
+
+/* Empty State */
+.empty-friends {
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--gray-500);
+}
+
+.empty-friends i {
+    font-size: 64px;
+    color: var(--gray-400);
+    margin-bottom: var(--spacing-lg);
+}
+
+.empty-friends h3 {
+    color: var(--gray-700);
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-sm);
+}
+
+.empty-friends p {
+    color: var(--gray-600);
+    font-size: var(--font-size-md);
+}
+
+/* ============================================ */
+/* RESTRICTED CONTENT (When Not Friends) */
+/* ============================================ */
+
+.restricted-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    padding: var(--spacing-xl);
+}
+
+.restricted-card {
+    text-align: center;
+    background: var(--white);
+    padding: 60px 40px;
+    max-width: 500px;
+    width: 100%;
+}
+
+.restricted-card i {
+    font-size: 24px;
+    color: var(--white);
+}
+
+.restricted-card .fa-lock {
+    color: var(--primary-color);
+}
+
+.restricted-card h3 {
+    color: var(--primary-dark);
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--spacing-sm);
+}
+
+.restricted-card p {
+    color: var(--gray-600);
+    font-size: var(--font-size-md);
+    margin-bottom: var(--spacing-xl);
+    line-height: var(--line-height-relaxed);
+}
+
+.btn-add-friend-large {
+    background: var(--gradient-primary);
+    color: var(--white);
+    border: none;
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: var(--transition-normal);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+.btn-add-friend-large:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-add-friend-large i {
+    margin-right: var(--spacing-xs);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .friends-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+
+    .friend-avatar {
+        width: 60px;
+        height: 60px;
+    }
+
+    .restricted-card {
+        padding: 40px 20px;
+    }
+}

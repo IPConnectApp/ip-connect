@@ -1,4 +1,4 @@
-import { initializeEmojiPicker } from '../utils/emoji.js';
+//import { initializeEmojiPicker } from '../utils/emoji.js';
 
 // Global variables
 let currentConversationId = null;
@@ -7,6 +7,7 @@ let currentChatUserId = null;
 let connection = null;
 let typingTimeout = null;
 let typingUsers = {};
+let isSending = false;
 
 // Initialize chat-specific SignalR handlers
 async function initializeChatSignalR() {
@@ -210,8 +211,12 @@ function displaySearchResults(users) {
 // Start chat with selected user
 async function startChat(userId, username, profilePicture) {
     // Hide search results
-    searchResults.style.display = 'none';
-    searchInput.value = '';
+    if (searchResults) {
+        searchResults.style.display = 'none';
+    }
+    if (searchInput) {
+        searchInput.value = '';
+    }
 
     try {
         // Call API to get or create conversation
@@ -264,8 +269,32 @@ function openChatModal(username, profilePicture) {
         initializeEmojiPicker();
     }, 100);
 
-    // Focus on input
-    document.getElementById('messageInput').focus();
+    // Focus on input and attach typing listeners
+    const messageInput = document.getElementById('messageInput');
+    if (messageInput) {
+        messageInput.focus();
+
+        // Attach typing event listeners (if not already attached)
+        if (!messageInput.hasAttribute('data-typing-listeners')) {
+            messageInput.addEventListener('input', function () {
+                notifyTyping();
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    notifyStoppedTyping();
+                }, 2000);
+            });
+
+            messageInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                    notifyStoppedTyping();
+                }
+            });
+
+            // Mark as having listeners
+            messageInput.setAttribute('data-typing-listeners', 'true');
+        }
+    }
 
     // Close modal when clicking on backdrop (outside modal content)
     modal.addEventListener('click', function handleModalClick(e) {
@@ -343,20 +372,20 @@ function displayMessages(messages) {
         const messageDate = new Date(timestamp);
         const now = new Date();
         const isToday = messageDate.toDateString() === now.toDateString();
-        
-        const time = isToday 
-            ? messageDate.toLocaleString('en-US', { 
-                hour: '2-digit', 
+
+        const time = isToday
+            ? messageDate.toLocaleString('en-US', {
+                hour: '2-digit',
                 minute: '2-digit',
                 hour12: false  //
-              })
-            : messageDate.toLocaleString('en-US', { 
-                month: 'short', 
-                day: 'numeric', 
-                hour: '2-digit', 
+            })
+            : messageDate.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
                 minute: '2-digit',
                 hour12: false  //
-              });
+            });
 
         return `
             <div class="chat-message ${messageClass}">
@@ -373,8 +402,6 @@ function displayMessages(messages) {
     // Scroll to bottom
     scrollToBottom();
 }
-
-let isSending = false;
 
 // Send message
 async function sendMessage() {
@@ -440,20 +467,20 @@ function addMessageToUI(message, isSent) {
     const messageDate = new Date(timestamp);
     const now = new Date();
     const isToday = messageDate.toDateString() === now.toDateString();
-    
-    const time = isToday 
-        ? messageDate.toLocaleString('en-US', { 
-            hour: '2-digit', 
+
+    const time = isToday
+        ? messageDate.toLocaleString('en-US', {
+            hour: '2-digit',
             minute: '2-digit',
             hour12: false
-          })
-        : messageDate.toLocaleString('en-US', { 
-            month: 'short', 
-            day: 'numeric', 
-            hour: '2-digit', 
+        })
+        : messageDate.toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
             minute: '2-digit',
             hour12: false
-          });
+        });
 
     const messageHtml = `
         <div class="chat-message ${messageClass}">
@@ -539,6 +566,11 @@ async function loadConversations() {
 // Display conversations in the list
 function displayConversations(conversations) {
     const chatList = document.getElementById('privateChats');
+
+    // If chat list doesn't exist (not on Chats page), skip
+    if (!chatList) {
+        return;
+    }
 
     if (conversations.length === 0) {
         chatList.innerHTML = '<p class="no-chats-message">No conversations yet. Search for users to start chatting!</p>';
