@@ -1,6 +1,8 @@
 using ip_connect.Dtos.UserProfile;
 using ip_connect.Models;
 using ip_connect.Services.UserProfileService;
+using System.Security.Claims;
+using ip_connect.Services.FriendshipService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -14,10 +16,12 @@ namespace ip_connect.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserProfileService _profileService;
+        private readonly IFriendshipService _friendshipService;
 
-        public ProfileController(UserManager<ApplicationUser> userManager, IUserProfileService profileService)
+        public ProfileController(UserManager<ApplicationUser> userManager, IFriendshipService friendshipService, IUserProfileService profileService)
         {
             _userManager = userManager;
+            _friendshipService = friendshipService;
             _profileService = profileService;
         }
 
@@ -36,9 +40,26 @@ namespace ip_connect.Controllers
             if (user == null)
                 return NotFound();
 
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(currentUserId))
+                return Unauthorized();
+
+            var isOwnProfile = currentUserId == user.Id;
+            var areFriends = false;
+
+            if (!isOwnProfile)
+            {
+                areFriends = await _friendshipService.AreFriendsAsync(currentUserId, user.Id);
+            }
+
             ViewData["Username"] = username;
             ViewData["CurrentTab"] = "Photos";
             ViewData["ProfilePictureUrl"] = user.ProfilePictureUrl ?? "/images/default-avatar.jpg";
+            ViewData["IsOwnProfile"] = isOwnProfile;
+            ViewData["AreFriends"] = areFriends;
+            ViewData["ProfileUserId"] = user.Id;
+
             return View();
         }
 
@@ -50,9 +71,26 @@ namespace ip_connect.Controllers
             if (user == null)
                 return NotFound();
 
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(currentUserId))
+                return Unauthorized();
+
+            var isOwnProfile = currentUserId == user.Id;
+            var areFriends = false;
+
+            if (!isOwnProfile)
+            {
+                areFriends = await _friendshipService.AreFriendsAsync(currentUserId, user.Id);
+            }
+
             ViewData["Username"] = username;
             ViewData["CurrentTab"] = "Friends";
             ViewData["ProfilePictureUrl"] = user.ProfilePictureUrl ?? "/images/default-avatar.jpg";
+            ViewData["IsOwnProfile"] = isOwnProfile;
+            ViewData["AreFriends"] = areFriends;
+            ViewData["ProfileUserId"] = user.Id;
+
             return View();
         }
 
@@ -64,11 +102,11 @@ namespace ip_connect.Controllers
             if (user == null)
                 return NotFound();
 
-            // Check if viewing own profile
-            if (User.Identity?.Name != username)
-            {
-                return RedirectToAction("Photos", new { username });
-            }
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Only the owner can view settings
+            if (currentUserId != user.Id)
+                return Forbid();
 
             ViewData["Username"] = username;
             ViewData["CurrentTab"] = "Chats";
@@ -84,13 +122,20 @@ namespace ip_connect.Controllers
             if (user == null) return NotFound();
 
             // Проверка дали текущият потребител е собственик на профила
-            if (User.Identity?.Name != username)
-            {
-                return RedirectToAction("Photos", new { username });
-            }
-
+            // if (User.Identity?.Name != username)
+            // {
+            //     return RedirectToAction("Photos", new { username });
+            // }
+            
             // Взимаме DTO от сървиса
             var profileDto = await _profileService.GetOrCreateProfileAsync(user.Id, user.UserName);
+
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Only the owner can view settings
+            if (currentUserId != user.Id)
+                return Forbid();
+
 
             ViewData["Username"] = username;
             ViewData["CurrentTab"] = "Settings";

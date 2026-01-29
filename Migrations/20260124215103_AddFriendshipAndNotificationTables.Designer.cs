@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ip_connect.Data;
 
@@ -11,9 +12,11 @@ using ip_connect.Data;
 namespace ip_connect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260124215103_AddFriendshipAndNotificationTables")]
+    partial class AddFriendshipAndNotificationTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -401,52 +404,6 @@ namespace ip_connect.Migrations
                     b.ToTable("Notifications");
                 });
 
-            modelBuilder.Entity("ip_connect.Models.UserProfile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Bio")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime?>("BirthDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Gender")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<bool>("IsOnline")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastSeen")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("UserProfiles");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -566,8 +523,6 @@ namespace ip_connect.Migrations
                     b.Navigation("Sender");
                 });
 
-            // --- КОНФЛИКТ 2 РЕШЕН: Добавени са връзките и за UserProfile, и за Notification ---
-
             modelBuilder.Entity("ip_connect.Models.Notification", b =>
                 {
                     b.HasOne("ip_connect.Models.ApplicationUser", "RelatedUser")
@@ -584,22 +539,6 @@ namespace ip_connect.Migrations
                     b.Navigation("RelatedUser");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ip_connect.Models.UserProfile", b =>
-                {
-                    b.HasOne("ip_connect.Models.ApplicationUser", "User")
-                        .WithOne("Profile")
-                        .HasForeignKey("ip_connect.Models.UserProfile", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ip_connect.Models.ApplicationUser", b =>
-                {
-                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("ip_connect.Models.Conversation", b =>

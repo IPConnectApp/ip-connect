@@ -7,7 +7,8 @@
 @{
     var username = ViewData["Username"]?.ToString() ?? User.Identity?.Name ?? "";
     var currentTab = ViewData["CurrentTab"]?.ToString() ?? "Photos";
-    var isOwnProfile = User.Identity?.Name == username;
+    var isOwnProfile = ViewData["IsOwnProfile"] as bool? ?? true;
+    var areFriends = ViewData["AreFriends"] as bool? ?? false;
     var profilePicUrl = ViewData["ProfilePictureUrl"]?.ToString() ?? "/images/default-avatar.jpg";
 
     string displayName = username;
@@ -37,6 +38,8 @@
             age = $", {a}";
         }
     }
+    // Show tabs only if: own profile OR friends
+    var showTabs = isOwnProfile || areFriends;
 }
 
 <!DOCTYPE html>
@@ -52,8 +55,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="~/css/profile/profile.css" />
     <link rel="stylesheet" href="~/css/profile/settings.css" />
+    <link rel="stylesheet" href="~/css/navbar-notifications.css" />
+    <link rel="stylesheet" href="~/css/profile/chat.css" />
 
-    <!-- SignalR Client Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
     <script src="~/js/global-signalr.js"></script>
     <script src="~/js/profile/profile-badge.js"></script>
@@ -62,10 +66,8 @@
 </head>
 
 <body>
-    <!-- Top Navbar -->
     @await Html.PartialAsync("_Navbar")
 
-    <!-- Profile Container -->
     <div class="profile-container">
         <!-- Left Sidebar -->
         <aside class="profile-sidebar">
@@ -98,26 +100,29 @@
 
         <!-- Right Content Area -->
         <main class="profile-content">
-            <!-- Tab Navigation -->
-            <nav class="profile-tabs">
-                <a href="/profile/@username/photos" class="profile-tab @(currentTab == "Photos" ? "active" : "")">
-                    <i class="fas fa-images"></i> Photos
-                </a>
-                <a href="/profile/@username/friends" class="profile-tab @(currentTab == "Friends" ? "active" : "")">
-                    <i class="fas fa-user-friends"></i> Friends
-                </a>
+            @if (showTabs)
+            {
+                <!-- Tab Navigation (only show if friends or own profile) -->
+                <nav class="profile-tabs">
+                    <a href="/profile/@username/photos" class="profile-tab @(currentTab == "Photos" ? "active" : "")">
+                        <i class="fas fa-images"></i> Photos
+                    </a>
+                    <a href="/profile/@username/friends" class="profile-tab @(currentTab == "Friends" ? "active" : "")">
+                        <i class="fas fa-user-friends"></i> Friends
+                    </a>
 
-                @if (isOwnProfile)
-                {
-                    <a href="/profile/@username/chats" class="profile-tab @(currentTab == "Chats" ? "active" : "")">
-                        <i class="fas fa-comments"></i> Chats
-                        <span id="profileUnreadBadge" class="profile-tab-badge" style="display: none;">0</span>
-                    </a>
-                    <a href="/profile/@username/settings" class="profile-tab @(currentTab == "Settings" ? "active" : "")">
-                        <i class="fas fa-cog"></i> Settings
-                    </a>
-                }
-            </nav>
+                    @if (isOwnProfile)
+                    {
+                        <a href="/profile/@username/chats" class="profile-tab @(currentTab == "Chats" ? "active" : "")">
+                            <i class="fas fa-comments"></i> Chats
+                            <span id="profileUnreadBadge" class="profile-tab-badge" style="display: none;">0</span>
+                        </a>
+                        <a href="/profile/@username/settings" class="profile-tab @(currentTab == "Settings" ? "active" : "")">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                    }
+                </nav>
+            }
 
             <!-- Tab Content -->
             <div class="profile-tab-content">
@@ -126,7 +131,66 @@
         </main>
     </div>
 
+    <!-- Chat Modal (available on all profile pages) -->
+    <div id="chatModal" class="chat-modal" style="display: none;">
+        <div class="chat-modal-content">
+            <!-- Modal Header -->
+            <div class="chat-modal-header">
+                <div class="chat-modal-user-info">
+                    <img id="modalUserAvatar" src="" alt="" class="chat-modal-avatar">
+                    <span id="modalUsername" class="chat-modal-username"></span>
+                </div>
+                <button class="chat-modal-close" onclick="closeChatModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="chat-modal-messages" id="chatMessages">
+                <!-- Messages will be loaded here -->
+            </div>
+
+            <!-- Typing Indicator -->
+            <div id="typingIndicator" class="typing-indicator" style="display: none;">
+                <div class="typing-dots">
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                </div>
+                <span id="typingUsername"></span> is typing...
+            </div>
+
+            <!-- Input Area -->
+            <div class="chat-modal-input">
+                <button class="chat-emoji-button" id="emojiButton" type="button">
+                    <i class="far fa-smile"></i>
+                </button>
+                <input type="text" id="messageInput" class="chat-message-input" placeholder="Type a message..."
+                    autocomplete="off">
+                <button class="chat-send-button" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+
+            <!-- Emoji Picker Container -->
+            <div id="emojiPickerContainer" class="emoji-picker-container" style="display: none;">
+                <emoji-picker></emoji-picker>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pass current username to JavaScript -->
+    <script>
+        window.currentUsername = '@User.Identity?.Name';
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/navbar-notifications.js"></script>
+    <script src="~/js/utils/emoji.js"></script>
+    <script src="~/js/profile/chat.js"></script>
+    <script type="module">
+        import 'https://cdn.jsdelivr.net/npm/emoji-picker-element@1.21.3/index.js';
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 

@@ -15,6 +15,10 @@ using ip_connect.Services.UserProfileService;
 using ip_connect.Services.UserService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ip_connect.Repositories.FriendshipRepository;
+using ip_connect.Repositories.NotificationRepository;
+using ip_connect.Services.FriendshipService;
+using ip_connect.Services.NotificationService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,6 +81,8 @@ builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
 builder.Services.AddScoped<IConversationMemberRepository, ConversationMemberRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+builder.Services.AddScoped<IFriendshipRepository, FriendshipRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 // Register Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -85,6 +91,8 @@ builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<IFriendshipService, FriendshipService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // Add SignalR
 builder.Services.AddSignalR();
@@ -129,6 +137,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapHub<ChatHub>("/chathub");
+app.MapHub<NotificationHub>("/notificationhub");
 
 // Auto-apply migrations on startup
 // using (var scope = app.Services.CreateScope())
