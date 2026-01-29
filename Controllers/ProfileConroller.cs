@@ -121,11 +121,6 @@ namespace ip_connect.Controllers
             var user = await _userManager.FindByNameAsync(username);
             if (user == null) return NotFound();
 
-            // Проверка дали текущият потребител е собственик на профила
-            // if (User.Identity?.Name != username)
-            // {
-            //     return RedirectToAction("Photos", new { username });
-            // }
             
             // Взимаме DTO от сървиса
             var profileDto = await _profileService.GetOrCreateProfileAsync(user.Id, user.UserName);

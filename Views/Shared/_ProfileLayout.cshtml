@@ -15,6 +15,7 @@
     string gender = "Not specified";
     string age = "";
     string joinedDate = "";
+    string birthDateString = "";
     string bio = "";
 
     var user = await UserManager.FindByNameAsync(username);
@@ -36,6 +37,8 @@
             var a = today.Year - birthDate.Year;
             if (birthDate.Date > today.AddYears(-a)) a--;
             age = $", {a}";
+
+            birthDateString = profile.BirthDate.Value.ToString("dd MMMM yyyy");
         }
     }
     // Show tabs only if: own profile OR friends
@@ -78,6 +81,11 @@
 
             <div class="profile-info">
                 <p><i class="fas fa-venus-mars"></i> @gender@age</p>
+
+                @if (!string.IsNullOrEmpty(birthDateString))
+                {
+                    <p><i class="fas fa-birthday-cake"></i> @birthDateString</p>
+                }
 
                 <p><i class="fas fa-calendar"></i> Joined @joinedDate</p>
             </div>
