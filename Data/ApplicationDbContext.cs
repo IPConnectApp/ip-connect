@@ -1,4 +1,5 @@
-﻿using ip_connect.Models;
+﻿using ip_connect.Data.Configurations;
+using ip_connect.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,7 @@ namespace ip_connect.Data
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Friendship> Friendships { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Album> Albums { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

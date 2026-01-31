@@ -9,14 +9,120 @@
 @if (isOwnProfile || areFriends)
 {
     <div class="tab-content-header">
-        <h1>Photos</h1>
+        <div class="tab-header-row">
+            <h1>Photos</h1>
+            @if (isOwnProfile)
+            {
+                <button class="btn-create-album" onclick="openCreateAlbumModal()">
+                    <i class="fas fa-plus"></i> Create Album
+                </button>
+            }
+        </div>
     </div>
 
-    <div class="tab-placeholder">
-        <i class="fas fa-images fa-5x"></i>
-        <h2>This is the Photos page</h2>
-        <p>Here you will see your photos</p>
+    <!-- Albums Grid -->
+    <div class="albums-container">
+        <div id="albumsGrid" class="albums-grid">
+            <!-- Albums will be loaded here by JavaScript -->
+        </div>
+
+        <!-- Empty State (shown when no albums exist) -->
+        <div id="emptyAlbums" class="empty-albums" style="display: none;">
+            <i class="fas fa-images"></i>
+            <h3>No Albums Yet</h3>
+            @if (isOwnProfile)
+            {
+                <p>Create your first album to start sharing photos!</p>
+            }
+            else
+            {
+                <p>@ViewData["Username"] doesn't have any albums yet.</p>
+            }
+        </div>
     </div>
+
+    <!-- Create Album Modal -->
+    @if (isOwnProfile)
+    {
+        <div id="createAlbumModal" class="album-modal-overlay" style="display: none;">
+            <div class="album-modal">
+                <div class="album-modal-header">
+                    <h3><i class="fas fa-folder-plus"></i> Create Album</h3>
+                    <button class="album-modal-close" onclick="closeCreateAlbumModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="album-modal-body">
+                    <div class="album-form-group">
+                        <label for="albumName">Album Name</label>
+                        <input type="text" id="albumName" class="album-form-input" placeholder="Enter album name..." maxlength="100">
+                        <span id="albumNameError" class="album-form-error" style="display: none;"></span>
+                    </div>
+                    <div class="album-form-group">
+                        <label for="albumDescription">Description (optional)</label>
+                        <textarea id="albumDescription" class="album-form-textarea" placeholder="Add a description..." maxlength="500"></textarea>
+                    </div>
+                </div>
+                <div class="album-modal-footer">
+                    <button class="btn-album-cancel" onclick="closeCreateAlbumModal()">Cancel</button>
+                    <button class="btn-album-submit" onclick="createAlbum()">
+                        <i class="fas fa-folder-plus"></i> Create Album
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Album Modal -->
+        <div id="editAlbumModal" class="album-modal-overlay" style="display: none;">
+            <div class="album-modal">
+                <div class="album-modal-header">
+                    <h3><i class="fas fa-edit"></i> Edit Album</h3>
+                    <button class="album-modal-close" onclick="closeEditAlbumModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="album-modal-body">
+                    <input type="hidden" id="editAlbumId">
+                    <div class="album-form-group">
+                        <label for="editAlbumName">Album Name</label>
+                        <input type="text" id="editAlbumName" class="album-form-input" placeholder="Enter album name..." maxlength="100">
+                        <span id="editAlbumNameError" class="album-form-error" style="display: none;"></span>
+                    </div>
+                    <div class="album-form-group">
+                        <label for="editAlbumDescription">Description (optional)</label>
+                        <textarea id="editAlbumDescription" class="album-form-textarea" placeholder="Add a description..." maxlength="500"></textarea>
+                    </div>
+                </div>
+                <div class="album-modal-footer">
+                    <button class="btn-album-cancel" onclick="closeEditAlbumModal()">Cancel</button>
+                    <button class="btn-album-submit" onclick="updateAlbum()">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteAlbumModal" class="album-modal-overlay" style="display: none;">
+            <div class="album-modal album-modal-small">
+                <div class="album-modal-header">
+                    <h3><i class="fas fa-trash-alt"></i> Delete Album</h3>
+                    <button class="album-modal-close" onclick="closeDeleteAlbumModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="album-modal-body">
+                    <p class="album-delete-text">Are you sure you want to delete "<span id="deleteAlbumName"></span>"? This action cannot be undone!</p>
+                </div>
+                <div class="album-modal-footer">
+                    <button class="btn-album-cancel" onclick="closeDeleteAlbumModal()">Cancel</button>
+                    <button class="btn-album-delete" onclick="confirmDeleteAlbum()">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
 }
 else
 {
@@ -34,8 +140,17 @@ else
 
 @section Styles {
     <link rel="stylesheet" href="~/css/profile/friends.css" />
+    <link rel="stylesheet" href="~/css/profile/albums.css" />
 }
 
 @section Scripts {
     <script src="~/js/profile/friends.js"></script>
+    <script>
+        // Pass data to albums.js
+        window.albumsConfig = {
+            isOwnProfile: @Json.Serialize(isOwnProfile),
+            profileUserId: '@profileUserId'
+        };
+    </script>
+    <script src="~/js/profile/albums.js"></script>
 }

@@ -19,6 +19,8 @@ using ip_connect.Repositories.FriendshipRepository;
 using ip_connect.Repositories.NotificationRepository;
 using ip_connect.Services.FriendshipService;
 using ip_connect.Services.NotificationService;
+using ip_connect.Services.Albums;
+using ip_connect.Repositories.AlbumRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,6 +85,7 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 builder.Services.AddScoped<IFriendshipRepository, FriendshipRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IAlbumRepository, AlbumRepository>();
 
 // Register Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -93,6 +96,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<IFriendshipService, FriendshipService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IAlbumService, AlbumService>();
 
 // Add SignalR
 builder.Services.AddSignalR();

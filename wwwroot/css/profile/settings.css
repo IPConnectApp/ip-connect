@@ -2,23 +2,24 @@
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    text-align: left; /* Връщаме подравняването в ляво за формата */
+    text-align: left;
+    /* Връщаме подравняването в ляво за формата */
 }
 
 .settings-card {
     background: white;
     padding: 30px;
     border-radius: 20px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     margin-bottom: 30px;
 }
 
-    .settings-card h3 {
-        margin-bottom: 25px;
-        color: var(--primary-dark);
-        border-bottom: 2px solid var(--gray-200);
-        padding-bottom: 10px;
-    }
+.settings-card h3 {
+    margin-bottom: 25px;
+    color: var(--primary-dark);
+    border-bottom: 2px solid var(--gray-200);
+    padding-bottom: 10px;
+}
 
 /* Avatar Upload Specifics */
 .avatar-section {
@@ -46,9 +47,9 @@
     display: inline-block;
 }
 
-    .file-upload-btn:hover {
-        background: var(--gray-300);
-    }
+.file-upload-btn:hover {
+    background: var(--gray-300);
+}
 
 /* Hide default file input */
 input[type="file"] {
@@ -65,4 +66,21 @@ input[type="file"] {
     font-size: 1.1rem;
     font-weight: bold;
     margin-top: 10px;
+}
+
+.form-control {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-family: var(--font-family-primary);
+    transition: var(--transition-normal);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    background: var(--white);
+    outline: none;
+    box-shadow: none;
 }
