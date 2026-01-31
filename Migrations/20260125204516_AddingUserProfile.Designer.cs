@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ip_connect.Data;
 
@@ -11,9 +12,11 @@ using ip_connect.Data;
 namespace ip_connect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260125204516_AddingUserProfile")]
+    partial class AddingUserProfile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -281,48 +284,12 @@ namespace ip_connect.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ConversationId");
-
                     b.HasIndex("UserId");
 
-                    b.ToTable("ConversationMembers");
-                });
-
-            modelBuilder.Entity("ip_connect.Models.Friendship", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("AcceptedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FriendId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("RequestedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FriendId");
-
-                    b.HasIndex("UserId", "FriendId")
+                    b.HasIndex("ConversationId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("Friendships");
+                    b.ToTable("ConversationMembers");
                 });
 
             modelBuilder.Entity("ip_connect.Models.Message", b =>
@@ -356,49 +323,6 @@ namespace ip_connect.Migrations
                     b.HasIndex("SenderId");
 
                     b.ToTable("Messages");
-                });
-
-            modelBuilder.Entity("ip_connect.Models.Notification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int?>("RelatedEntityId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RelatedUserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RelatedUserId");
-
-                    b.HasIndex("UserId", "IsRead");
-
-                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("ip_connect.Models.UserProfile", b =>
@@ -528,25 +452,6 @@ namespace ip_connect.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ip_connect.Models.Friendship", b =>
-                {
-                    b.HasOne("ip_connect.Models.ApplicationUser", "Friend")
-                        .WithMany()
-                        .HasForeignKey("FriendId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ip_connect.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Friend");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ip_connect.Models.Message", b =>
                 {
                     b.HasOne("ip_connect.Models.Conversation", "Conversation")
@@ -564,26 +469,6 @@ namespace ip_connect.Migrations
                     b.Navigation("Conversation");
 
                     b.Navigation("Sender");
-                });
-
-            // --- КОНФЛИКТ 2 РЕШЕН: Добавени са връзките и за UserProfile, и за Notification ---
-
-            modelBuilder.Entity("ip_connect.Models.Notification", b =>
-                {
-                    b.HasOne("ip_connect.Models.ApplicationUser", "RelatedUser")
-                        .WithMany()
-                        .HasForeignKey("RelatedUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("ip_connect.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("RelatedUser");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ip_connect.Models.UserProfile", b =>

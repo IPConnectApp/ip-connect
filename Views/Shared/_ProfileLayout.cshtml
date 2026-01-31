@@ -1,3 +1,9 @@
+@using Microsoft.AspNetCore.Identity
+@using ip_connect.Models
+@using ip_connect.Services.UserProfileService
+@inject UserManager<ApplicationUser> UserManager
+@inject IUserProfileService ProfileService
+
 @{
     var username = ViewData["Username"]?.ToString() ?? User.Identity?.Name ?? "";
     var currentTab = ViewData["CurrentTab"]?.ToString() ?? "Photos";
@@ -5,6 +11,36 @@
     var areFriends = ViewData["AreFriends"] as bool? ?? false;
     var profilePicUrl = ViewData["ProfilePictureUrl"]?.ToString() ?? "/images/default-avatar.jpg";
 
+    string displayName = username;
+    string gender = "Not specified";
+    string age = "";
+    string joinedDate = "";
+    string birthDateString = "";
+    string bio = "";
+
+    var user = await UserManager.FindByNameAsync(username);
+    if (user != null)
+    {
+        var profile = await ProfileService.GetOrCreateProfileAsync(user.Id, user.UserName);
+
+        displayName = profile.DisplayName;
+        gender = profile.Gender ?? "Not specified";
+        bio = profile.Bio;
+        joinedDate = profile.CreatedAt.ToString("MMMM yyyy");
+
+        //missing location
+
+        if (profile.BirthDate.HasValue)
+        {
+            var today = DateTime.Today;
+            var birthDate = profile.BirthDate.Value;
+            var a = today.Year - birthDate.Year;
+            if (birthDate.Date > today.AddYears(-a)) a--;
+            age = $", {a}";
+
+            birthDateString = profile.BirthDate.Value.ToString("dd MMMM yyyy");
+        }
+    }
     // Show tabs only if: own profile OR friends
     var showTabs = isOwnProfile || areFriends;
 }
@@ -21,6 +57,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="~/css/profile/profile.css" />
+    <link rel="stylesheet" href="~/css/profile/settings.css" />
     <link rel="stylesheet" href="~/css/navbar-notifications.css" />
     <link rel="stylesheet" href="~/css/profile/chat.css" />
 
@@ -40,14 +77,32 @@
             <div class="profile-picture">
                 <img src="@profilePicUrl" alt="Profile Picture" />
             </div>
-            <h2 class="profile-name">@username</h2>
+            <h2 class="profile-name">@displayName</h2>
+
             <div class="profile-info">
-                <p><i class="fas fa-venus-mars"></i> Male, 25</p>
-                <p><i class="fas fa-map-marker-alt"></i> Sofia, Bulgaria</p>
-                <p><i class="fas fa-calendar"></i> Joined January 2026</p>
+                <p><i class="fas fa-venus-mars"></i> @gender@age</p>
+
+                @if (!string.IsNullOrEmpty(birthDateString))
+                {
+                    <p><i class="fas fa-birthday-cake"></i> @birthDateString</p>
+                }
+
+                <p><i class="fas fa-calendar"></i> Joined @joinedDate</p>
             </div>
+
             <div class="profile-bio">
-                <p>This is my bio. I love coding and building amazing apps!</p>
+                <p>
+                    @if (!string.IsNullOrEmpty(bio))
+                    {
+                        @bio
+                    }
+                    else
+                    {
+                        <span class="text-muted" style="font-style: italic; font-size: 0.9em;">
+                            No bio provided yet.
+                        </span>
+                    }
+                </p>
             </div>
         </aside>
 
