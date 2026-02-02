@@ -50,7 +50,9 @@ namespace ip_connect.Controllers
 
             if (!isOwnProfile)
             {
-                areFriends = await _friendshipService.AreFriendsAsync(currentUserId, user.Id);
+                var friendshipStatus = await _friendshipService.GetFriendshipStatusAsync(currentUserId, user.Id);
+                areFriends = friendshipStatus.AreFriends;
+                ViewData["HasPendingRequest"] = friendshipStatus.HasPendingRequest;
             }
 
             ViewData["Username"] = username;
@@ -81,7 +83,9 @@ namespace ip_connect.Controllers
 
             if (!isOwnProfile)
             {
-                areFriends = await _friendshipService.AreFriendsAsync(currentUserId, user.Id);
+                var friendshipStatus = await _friendshipService.GetFriendshipStatusAsync(currentUserId, user.Id);
+                areFriends = friendshipStatus.AreFriends;
+                ViewData["HasPendingRequest"] = friendshipStatus.HasPendingRequest;
             }
 
             ViewData["Username"] = username;
@@ -121,7 +125,7 @@ namespace ip_connect.Controllers
             var user = await _userManager.FindByNameAsync(username);
             if (user == null) return NotFound();
 
-            
+
             // Взимаме DTO от сървиса
             var profileDto = await _profileService.GetOrCreateProfileAsync(user.Id, user.UserName);
 

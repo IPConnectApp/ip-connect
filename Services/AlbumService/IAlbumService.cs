@@ -18,5 +18,7 @@ namespace ip_connect.Services.Albums
 
         // Delete an album
         Task DeleteAlbumAsync(int albumId, string userId);
+
+        Task<AlbumDto> GetAlbumByIdAsync(int albumId, string currentUserId);
     }
 }

@@ -1,0 +1,65 @@
+@{
+    ViewData["Title"] = "Album Details";
+    Layout = "_ProfileLayout";
+}
+
+<div class="album-details-container">
+    <div class="album-details-header">
+        <button class="btn-back" onclick="history.back()">
+            <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <div class="album-details-info">
+            <h1 id="albumName"></h1>
+            <p id="albumDescription" class="album-description"></p>
+            <span id="albumDate" class="album-date"></span>
+        </div>
+    </div>
+
+    <div class="album-photos-grid" id="photosGrid">
+        <!-- Петър will implement photo upload and display here -->
+        <div class="album-placeholder">
+            <i class="fas fa-images"></i>
+            <h3>Photos Coming Soon</h3>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile/album-details.css" />
+}
+
+@section Scripts {
+    <script>
+        const albumId = @ViewData["AlbumId"];
+        
+        // Load album details
+        async function loadAlbumDetails() {
+            try {
+                const response = await fetch(`/api/album/${albumId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load album');
+                }
+                
+                const album = await response.json();
+                
+                document.getElementById('albumName').textContent = album.name;
+                document.getElementById('albumDescription').textContent = album.description || 'No description';
+                
+                const date = new Date(album.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                document.getElementById('albumDate').textContent = `Created ${date}`;
+                
+            } catch (error) {
+                console.error('Error loading album:', error);
+                alert('Failed to load album');
+                history.back();
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadAlbumDetails);
+    </script>
+}

@@ -9,5 +9,7 @@ namespace ip_connect.Repositories.AlbumRepository
 
         // Check if user is the owner of the album
         Task<bool> IsAlbumOwnerAsync(int albumId, string userId);
+
+        Task<Album?> GetAlbumByIdAsync(int albumId);
     }
 }

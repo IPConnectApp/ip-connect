@@ -5,6 +5,7 @@ namespace ip_connect.Models.Enums
         FriendRequest = 1,
         FriendAccepted = 2,
         FriendRejected = 3,
+        FriendRemoved = 4,
         // Add more as needed
     }
 }

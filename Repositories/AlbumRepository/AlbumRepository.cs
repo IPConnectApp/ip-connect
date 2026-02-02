@@ -22,5 +22,11 @@ namespace ip_connect.Repositories.AlbumRepository
             return await _dbSet
                 .AnyAsync(a => a.Id == albumId && a.UserId == userId);
         }
+
+        public async Task<Album?> GetAlbumByIdAsync(int albumId)
+        {
+            return await _context.Albums
+                .FirstOrDefaultAsync(a => a.Id == albumId);
+        }
     }
 }

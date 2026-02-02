@@ -1,4 +1,5 @@
 using ip_connect.DTOs;
+using ip_connect.Exceptions;
 using ip_connect.Services.Albums;
 using ip_connect.Services.FriendshipService;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +11,7 @@ namespace ip_connect.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class AlbumController : ControllerBase
+    public class AlbumController : Controller
     {
         private readonly IAlbumService _albumService;
         private readonly IFriendshipService _friendshipService;
@@ -47,16 +48,24 @@ namespace ip_connect.Controllers
             return Ok(albums);
         }
 
-        // GET: api/album/{id}
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetAlbum(int id)
+        // GET: api/album/{albumId}
+        [HttpGet("{albumId}")]
+        public async Task<IActionResult> GetAlbum(int albumId)
         {
-            var album = await _albumService.GetAlbumByIdAsync(id);
-            if (album == null)
+            try
             {
-                return NotFound(new { message = "Album not found" });
+                var currentUserId = GetCurrentUserId();
+                var album = await _albumService.GetAlbumByIdAsync(albumId, currentUserId);
+                return Ok(album);
             }
-            return Ok(album);
+            catch (ForbiddenException)
+            {
+                return Forbid();
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
         }
 
         // POST: api/album

@@ -34,5 +34,8 @@ namespace ip_connect.Services.NotificationService
 
         Task SendNotificationToUserAsync(string userId, object notification);
         Task SendNotificationCountToUserAsync(string userId, int count);
+
+        // Create friend removed notification
+        Task CreateFriendRemovedNotificationAsync(string recipientUserId, string removedByUserId, int friendshipId);
     }
 }

@@ -195,8 +195,45 @@ namespace ip_connect.Services.FriendshipService
             if (friendship.UserId != userId && friendship.FriendId != userId)
                 throw new ForbiddenException("You cannot remove this friendship");
 
+            // Determine who is the other person
+            var otherUserId = friendship.UserId == userId ? friendship.FriendId : friendship.UserId;
+
             // Delete friendship
-            return await _friendshipRepository.DeleteAsync(friendshipId);
+            var deleted = await _friendshipRepository.DeleteAsync(friendshipId);
+            if (!deleted)
+                throw new BadRequestException("Failed to remove friend");
+
+            // Create notification for the other user
+            await _notificationService.CreateFriendRemovedNotificationAsync(
+                otherUserId,
+                userId,
+                friendshipId);
+
+            // Send real-time notification
+            var removedBy = await _userManager.FindByIdAsync(userId);
+            if (removedBy == null)
+                throw new NotFoundException("User not found");
+
+            var notificationDto = new NotificationDto
+            {
+                Id = 0,
+                Type = NotificationType.FriendRemoved,
+                Message = $"{removedBy.UserName} removed you from friends",
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow,
+                RelatedUserId = userId,
+                RelatedUsername = removedBy.UserName,
+                RelatedUserProfilePicture = removedBy.ProfilePictureUrl,
+                RelatedEntityId = friendshipId
+            };
+
+            await _notificationService.SendNotificationToUserAsync(otherUserId, notificationDto);
+
+            // Update notification badge count for the other user
+            var unreadCount = await _notificationService.GetUnreadCountAsync(otherUserId);
+            await _notificationService.SendNotificationCountToUserAsync(otherUserId, unreadCount);
+
+            return true;
         }
 
         public async Task<List<FriendDto>> GetFriendsAsync(string userId)
@@ -213,7 +250,8 @@ namespace ip_connect.Services.FriendshipService
                     UserId = friendUser.Id,
                     Username = friendUser.UserName ?? "",
                     ProfilePictureUrl = friendUser.ProfilePictureUrl,
-                    FriendsSince = f.AcceptedAt ?? f.RequestedAt
+                    FriendsSince = f.AcceptedAt ?? f.RequestedAt,
+                    FriendshipId = f.Id
                 };
             }).ToList();
 

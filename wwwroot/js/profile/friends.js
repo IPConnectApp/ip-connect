@@ -25,6 +25,8 @@ window.sendFriendRequest = async function (friendUserId) {
 
 // Friends Page JavaScript
 document.addEventListener('DOMContentLoaded', async function () {
+    if (!document.getElementById('profileUserId')) return;
+
     await loadFriendsPage();
 });
 
@@ -110,6 +112,11 @@ function displayFriendsList(friends, container) {
 
     const friendsHtml = friends.map(friend => `
         <div class="friend-card" onclick="window.location.href='/profile/${friend.username}/photos'">
+            ${isOwnProfile ? `
+                <button class="btn-remove-friend" onclick="event.stopPropagation(); openRemoveFriendModal('${friend.friendshipId}', '${escapeHtml(friend.username)}')">
+                    <i class="fas fa-times"></i>
+                </button>
+            ` : ''}
             <img src="${friend.profilePictureUrl || '/images/default-avatar.jpg'}" 
                  alt="${friend.username}" 
                  class="friend-avatar" />
@@ -135,6 +142,43 @@ function formatDate(dateString) {
     const date = new Date(dateString);
     const options = { year: 'numeric', month: 'short' };
     return date.toLocaleDateString('en-US', options);
+}
+
+//Remove friend
+let friendToRemove = null;
+
+function openRemoveFriendModal(friendshipId, username) {
+    friendToRemove = friendshipId;
+    document.getElementById('removeFriendUsername').textContent = username;
+    document.getElementById('removeFriendModal').style.display = 'flex';
+}
+
+function closeRemoveFriendModal() {
+    friendToRemove = null;
+    document.getElementById('removeFriendModal').style.display = 'none';
+}
+
+async function confirmRemoveFriend() {
+    if (!friendToRemove) return;
+
+    try {
+        const response = await fetch(`/api/friendship/remove/${friendToRemove}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            alert(error.error || 'Failed to remove friend');
+            return;
+        }
+
+        // Close modal and reload friends list
+        closeRemoveFriendModal();
+        await loadFriendsPage();
+    } catch (error) {
+        console.error('Error removing friend:', error);
+        alert('Failed to remove friend');
+    }
 }
 
 function escapeHtml(text) {
