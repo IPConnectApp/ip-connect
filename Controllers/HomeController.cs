@@ -28,7 +28,7 @@ namespace ip_connect.Controllers
                 var user = await _userManager.FindByNameAsync(username);
                 var correctUsername = user?.UserName ?? username;
                 
-                return RedirectToAction("Chats", "Profile", new { username = correctUsername });
+                return RedirectToAction("Photos", "Profile", new { username = correctUsername });
             }
 
             // If not logged in, redirect to login

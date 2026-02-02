@@ -1,0 +1,94 @@
+/* Album Details Page */
+
+.album-details-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+}
+
+.album-details-header {
+    margin-bottom: var(--spacing-xl);
+}
+
+.btn-back {
+    background: var(--gray-200);
+    color: var(--gray-700);
+    border: none;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: var(--transition-normal);
+    margin-bottom: var(--spacing-lg);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.btn-back:hover {
+    background: var(--gray-300);
+}
+
+.album-details-info h1 {
+    font-size: var(--font-size-xxl);
+    color: var(--gray-900);
+    margin-bottom: var(--spacing-sm);
+}
+
+.album-description {
+    font-size: var(--font-size-lg);
+    color: var(--gray-600);
+    margin-bottom: var(--spacing-xs);
+
+    /* Multi-line ellipsis */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    /* Fallback for non-webkit browsers */
+    max-height: 4.5em;
+    /* Approximately 3 lines */
+    line-height: 1.5em;
+
+    /* CRITICAL: Force word breaking */
+    word-wrap: break-word;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+.album-date {
+    font-size: var(--font-size-sm);
+    color: var(--gray-500);
+}
+
+.album-photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.album-placeholder {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--gray-500);
+}
+
+.album-placeholder i {
+    font-size: 64px;
+    color: var(--gray-400);
+    margin-bottom: var(--spacing-lg);
+}
+
+.album-placeholder h3 {
+    color: var(--gray-700);
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-sm);
+}
+
+.album-placeholder p {
+    color: var(--gray-600);
+    font-size: var(--font-size-md);
+}

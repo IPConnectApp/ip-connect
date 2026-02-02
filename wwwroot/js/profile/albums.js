@@ -54,6 +54,13 @@ function createAlbumCard(album) {
     const card = document.createElement('div');
     card.className = 'album-card';
 
+    card.addEventListener('click', function(e) {
+        if (e.target.closest('.album-card-actions')) {
+            return;
+        }
+        window.location.href = `/album/${album.id}`;
+    });
+
     const createdDate = new Date(album.createdAt).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long'

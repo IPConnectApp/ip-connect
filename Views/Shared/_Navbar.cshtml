@@ -41,7 +41,7 @@
                 </div>
 
                 <div class="navbar-user">
-                    <span class="navbar-username">@User.Identity.Name</span>
+                    <a href="/profile/@User.Identity.Name" class="navbar-username">@User.Identity.Name</a>
                     <form asp-action="Logout" asp-controller="Account" method="post" class="navbar-logout-form">
                         <button type="submit" class="navbar-logout-btn">
                             <i class="fas fa-sign-out-alt"></i> Logout

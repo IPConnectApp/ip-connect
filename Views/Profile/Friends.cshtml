@@ -8,6 +8,22 @@
 
 @if (isOwnProfile || areFriends)
 {
+    <div class="tab-content-header">
+        <h1>Friends</h1>
+    </div>
+
+    <!-- Search Bar (only on own profile) -->
+    @if (isOwnProfile)
+    {
+        <div class="friends-search-container">
+            <i class="fas fa-search friends-search-icon"></i>
+            <input type="text" id="friendSearchInput" class="friends-search-input" placeholder="Search users..."
+                autocomplete="off" />
+            <div id="friendSearchResults" class="friends-search-dropdown" style="display: none;"></div>
+        </div>
+    }
+
+    <!-- Friends Grid -->
     <div class="friends-container">
         <div id="friendsContent">
             <div class="loading-spinner">
@@ -17,17 +33,54 @@
         <input type="hidden" id="profileUserId" value="@profileUserId" />
         <input type="hidden" id="isOwnProfile" value="@isOwnProfile.ToString().ToLower()" />
     </div>
+
+    <!-- Remove Friend Modal (only for owner) -->
+    @if (isOwnProfile)
+    {
+        <div id="removeFriendModal" class="modal-overlay" style="display: none;">
+            <div class="ip-modal ip-modal-small">
+                <div class="ip-modal-header">
+                    <h3><i class="fas fa-user-minus"></i> Remove Friend</h3>
+                    <button class="ip-modal-close" onclick="closeRemoveFriendModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="ip-modal-body">
+                    <p class="ip-modal-confirm-text">Are you sure you want to remove <span id="removeFriendUsername"></span>
+                        from
+                        your friends?</p>
+                </div>
+                <div class="ip-modal-footer">
+                    <button class="btn-ip-modal-cancel" onclick="closeRemoveFriendModal()">Cancel</button>
+                    <button class="btn-ip-modal-delete" onclick="confirmRemoveFriend()">
+                        <i class="fas fa-user-minus"></i> Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
 }
 else
 {
+    var hasPendingRequest = ViewData["HasPendingRequest"] as bool? ?? false;
+
     <div class="restricted-content">
         <div class="restricted-card">
             <i class="fas fa-lock"></i>
             <h3>This Content is Private</h3>
             <p>You need to be friends with @ViewData["Username"] to view their friends list.</p>
-            <button class="btn-add-friend-large" onclick="sendFriendRequest('@profileUserId')">
-                <i class="fas fa-user-plus"></i> Add Friend
-            </button>
+            @if (hasPendingRequest)
+            {
+                <button class="btn-pending-large" disabled>
+                    <i class="fas fa-clock"></i> Pending
+                </button>
+            }
+            else
+            {
+                <button class="btn-add-friend-large" onclick="sendFriendRequest('@profileUserId')">
+                    <i class="fas fa-user-plus"></i> Add Friend
+                </button>
+            }
         </div>
     </div>
 }
@@ -38,4 +91,5 @@ else
 
 @section Scripts {
     <script src="~/js/profile/friends.js"></script>
+    <script src="~/js/profile/friends-search.js"></script>
 }

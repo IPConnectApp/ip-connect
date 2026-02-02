@@ -8,9 +8,13 @@ let connection = null;
 let typingTimeout = null;
 let typingUsers = {};
 let isSending = false;
+let chatSignalRInitialized = false;
 
 // Initialize chat-specific SignalR handlers
 async function initializeChatSignalR() {
+    // Already initialized - don't add duplicate handlers
+    if (chatSignalRInitialized) return;
+
     // Wait for global connection to be ready
     let attempts = 0;
     while (!window.globalConnection && attempts < 50) {
@@ -24,10 +28,8 @@ async function initializeChatSignalR() {
 
     connection = window.globalConnection;
 
-    // Remove any existing handlers to prevent duplicates
-    connection.off("ReceiveMessage");
-    connection.off("NewMessageNotification");
-    connection.off("NewConversationCreated");
+    // Mark as initialized before adding handlers
+    chatSignalRInitialized = true;
 
     // Chat-specific message handler
     connection.on("ReceiveMessage", function (message) {
@@ -89,7 +91,7 @@ async function initializeChatSignalR() {
 }
 
 // Initialize chat SignalR
-initializeChatSignalR();
+//initializeChatSignalR();
 
 // Join all user's conversation groups
 async function joinAllConversations() {
@@ -137,34 +139,36 @@ async function leaveConversation(conversationId) {
     }
 }
 
-// Chat Search Functionality
+// Chat Search Functionality (only on Chats page)
 const searchInput = document.getElementById('userSearchInput');
 const searchResults = document.getElementById('searchResults');
 
 let searchTimeout;
 
-// Search users as user types
-searchInput.addEventListener('input', function () {
-    const query = this.value.trim();
+if (searchInput && searchResults) {
+    // Search users as user types
+    searchInput.addEventListener('input', function () {
+        const query = this.value.trim();
 
-    clearTimeout(searchTimeout);
+        clearTimeout(searchTimeout);
 
-    if (query.length === 0) {
-        searchResults.style.display = 'none';
-        return;
-    }
+        if (query.length === 0) {
+            searchResults.style.display = 'none';
+            return;
+        }
 
-    searchTimeout = setTimeout(() => {
-        searchUsers(query);
-    }, 300);
-});
+        searchTimeout = setTimeout(() => {
+            searchUsers(query);
+        }, 300);
+    });
 
-// Close search results when clicking outside
-document.addEventListener('click', function (e) {
-    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-        searchResults.style.display = 'none';
-    }
-});
+    // Close search results when clicking outside
+    document.addEventListener('click', function (e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.style.display = 'none';
+        }
+    });
+}
 
 // Search users via API
 async function searchUsers(query) {
@@ -244,8 +248,11 @@ async function startChat(userId, username, profilePicture) {
         // Load messages
         await loadMessages(conversation.id);
 
-        // Reload conversations list to show new conversation
+        // Reload conversations and update badge
         await loadConversations();
+        if (typeof updateProfileUnreadBadge === 'function') {
+            updateProfileUnreadBadge();
+        }
     } catch (error) {
         console.error('Error starting chat:', error);
         alert('Failed to start chat. Please try again.');
@@ -253,7 +260,7 @@ async function startChat(userId, username, profilePicture) {
 }
 
 // Open chat modal
-function openChatModal(username, profilePicture) {
+async function openChatModal(username, profilePicture) {
     const modal = document.getElementById('chatModal');
     const modalUsername = document.getElementById('modalUsername');
     const modalAvatar = document.getElementById('modalUserAvatar');
@@ -263,6 +270,12 @@ function openChatModal(username, profilePicture) {
     modalAvatar.alt = username;
 
     modal.style.display = 'flex';
+
+    // // Update badge and refresh chat list
+    // loadConversations();
+    // if (typeof updateProfileUnreadBadge === 'function') {
+    //     updateProfileUnreadBadge();
+    // }
 
     // Initialize emoji picker
     setTimeout(() => {
@@ -316,7 +329,6 @@ async function closeChatModal() {
 
     if (currentConversationId) {
         await markAsRead(currentConversationId);
-        await leaveConversation(currentConversationId);
     }
 
     // Reset current chat info
@@ -634,8 +646,14 @@ async function openConversationFromList(conversationId, username, profilePicture
         // Open modal
         openChatModal(username, profilePicture);
 
-        // Load messages
+        // Load messages (marks as read inside)
         await loadMessages(currentConversationId);
+
+        // Reload conversations and update badge
+        await loadConversations();
+        if (typeof updateProfileUnreadBadge === 'function') {
+            updateProfileUnreadBadge();
+        }
 
     } catch (error) {
         console.error('Error opening conversation:', error);

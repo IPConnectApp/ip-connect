@@ -24,6 +24,8 @@ async function updateProfileUnreadBadge() {
     }
 }
 
+window.updateProfileUnreadBadge = updateProfileUnreadBadge;
+
 // Update badge on page load
 document.addEventListener('DOMContentLoaded', function() {
     updateProfileUnreadBadge();
@@ -33,6 +35,3 @@ document.addEventListener('DOMContentLoaded', function() {
 window.addEventListener('focus', function() {
     updateProfileUnreadBadge();
 });
-
-// Export function so chat.js can call it
-window.updateProfileUnreadBadge = updateProfileUnreadBadge;

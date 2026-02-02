@@ -164,5 +164,25 @@ namespace ip_connect.Services.NotificationService
         {
             await _hubContext.Clients.User(userId).SendAsync("UpdateNotificationCount", count);
         }
+
+        public async Task CreateFriendRemovedNotificationAsync(string recipientUserId, string removedByUserId, int friendshipId)
+        {
+            var removedBy = await _userManager.FindByIdAsync(removedByUserId);
+            if (removedBy == null)
+                return;
+
+            var notification = new Notification
+            {
+                UserId = recipientUserId,
+                Type = NotificationType.FriendRemoved,
+                RelatedUserId = removedByUserId,
+                RelatedEntityId = friendshipId,
+                Message = $"{removedBy.UserName} removed you from friends",
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _notificationRepository.CreateAsync(notification);
+        }
     }
 }

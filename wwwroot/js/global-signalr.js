@@ -11,22 +11,6 @@ async function initializeGlobalSignalR() {
         .withAutomaticReconnect()
         .build();
 
-    // Listen for new messages globally
-    connection.on("NewMessageNotification", function(message) {
-        //Update badge on ALL pages (Photos, Friends, Settings, etc.)
-        if (typeof window.updateProfileUnreadBadge === 'function') {
-            window.updateProfileUnreadBadge();
-        }
-    });
-
-    // Listen for new conversations
-    connection.on("NewConversationCreated", function(data) {
-        //Update badge when new conversation created
-        if (typeof window.updateProfileUnreadBadge === 'function') {
-            window.updateProfileUnreadBadge();
-        }
-    });
-
     // Start connection
     try {
         await connection.start();

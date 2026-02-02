@@ -67,12 +67,19 @@
 .navbar-user {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: var(--spacing-md);
 }
 
 .navbar-username {
+    color: var(--gray-700);
     font-weight: var(--font-weight-semibold);
-    color: var(--gray-800);
+    text-decoration: none;
+    transition: var(--transition-normal);
+}
+
+.navbar-username:hover {
+    color: var(--primary-color);
+    text-decoration: none;
 }
 
 .navbar-logout-form {

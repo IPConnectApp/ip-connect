@@ -44,28 +44,30 @@
     <!-- Create Album Modal -->
     @if (isOwnProfile)
     {
-        <div id="createAlbumModal" class="album-modal-overlay" style="display: none;">
-            <div class="album-modal">
-                <div class="album-modal-header">
+        <div id="createAlbumModal" class="modal-overlay" style="display: none;">
+            <div class="ip-modal">
+                <div class="ip-modal-header">
                     <h3><i class="fas fa-folder-plus"></i> Create Album</h3>
-                    <button class="album-modal-close" onclick="closeCreateAlbumModal()">
+                    <button class="ip-modal-close" onclick="closeCreateAlbumModal()">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <div class="album-modal-body">
-                    <div class="album-form-group">
+                <div class="ip-modal-body">
+                    <div class="ip-modal-form-group">
                         <label for="albumName">Album Name</label>
-                        <input type="text" id="albumName" class="album-form-input" placeholder="Enter album name..." maxlength="100">
-                        <span id="albumNameError" class="album-form-error" style="display: none;"></span>
+                        <input type="text" id="albumName" class="ip-modal-form-input" placeholder="Enter album name..."
+                            maxlength="100">
+                        <span id="albumNameError" class="ip-modal-form-error" style="display: none;"></span>
                     </div>
-                    <div class="album-form-group">
+                    <div class="ip-modal-form-group">
                         <label for="albumDescription">Description (optional)</label>
-                        <textarea id="albumDescription" class="album-form-textarea" placeholder="Add a description..." maxlength="500"></textarea>
+                        <textarea id="albumDescription" class="ip-modal-form-textarea" placeholder="Add a description..."
+                    maxlength="500"></textarea>
                     </div>
                 </div>
-                <div class="album-modal-footer">
-                    <button class="btn-album-cancel" onclick="closeCreateAlbumModal()">Cancel</button>
-                    <button class="btn-album-submit" onclick="createAlbum()">
+                <div class="ip-modal-footer">
+                    <button class="btn-ip-modal-cancel" onclick="closeCreateAlbumModal()">Cancel</button>
+                    <button class="btn-ip-modal-submit" onclick="createAlbum()">
                         <i class="fas fa-folder-plus"></i> Create Album
                     </button>
                 </div>
@@ -73,29 +75,31 @@
         </div>
 
         <!-- Edit Album Modal -->
-        <div id="editAlbumModal" class="album-modal-overlay" style="display: none;">
-            <div class="album-modal">
-                <div class="album-modal-header">
+        <div id="editAlbumModal" class="modal-overlay" style="display: none;">
+            <div class="ip-modal">
+                <div class="ip-modal-header">
                     <h3><i class="fas fa-edit"></i> Edit Album</h3>
-                    <button class="album-modal-close" onclick="closeEditAlbumModal()">
+                    <button class="ip-modal-close" onclick="closeEditAlbumModal()">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <div class="album-modal-body">
+                <div class="ip-modal-body">
                     <input type="hidden" id="editAlbumId">
-                    <div class="album-form-group">
+                    <div class="ip-modal-form-group">
                         <label for="editAlbumName">Album Name</label>
-                        <input type="text" id="editAlbumName" class="album-form-input" placeholder="Enter album name..." maxlength="100">
-                        <span id="editAlbumNameError" class="album-form-error" style="display: none;"></span>
+                        <input type="text" id="editAlbumName" class="ip-modal-form-input" placeholder="Enter album name..."
+                            maxlength="100">
+                        <span id="editAlbumNameError" class="ip-modal-form-error" style="display: none;"></span>
                     </div>
-                    <div class="album-form-group">
+                    <div class="ip-modal-form-group">
                         <label for="editAlbumDescription">Description (optional)</label>
-                        <textarea id="editAlbumDescription" class="album-form-textarea" placeholder="Add a description..." maxlength="500"></textarea>
+                        <textarea id="editAlbumDescription" class="ip-modal-form-textarea" placeholder="Add a description..."
+                    maxlength="500"></textarea>
                     </div>
                 </div>
-                <div class="album-modal-footer">
-                    <button class="btn-album-cancel" onclick="closeEditAlbumModal()">Cancel</button>
-                    <button class="btn-album-submit" onclick="updateAlbum()">
+                <div class="ip-modal-footer">
+                    <button class="btn-ip-modal-cancel" onclick="closeEditAlbumModal()">Cancel</button>
+                    <button class="btn-ip-modal-submit" onclick="updateAlbum()">
                         <i class="fas fa-save"></i> Save Changes
                     </button>
                 </div>
@@ -103,20 +107,21 @@
         </div>
 
         <!-- Delete Confirmation Modal -->
-        <div id="deleteAlbumModal" class="album-modal-overlay" style="display: none;">
-            <div class="album-modal album-modal-small">
-                <div class="album-modal-header">
+        <div id="deleteAlbumModal" class="modal-overlay" style="display: none;">
+            <div class="ip-modal ip-modal-small">
+                <div class="ip-modal-header">
                     <h3><i class="fas fa-trash-alt"></i> Delete Album</h3>
-                    <button class="album-modal-close" onclick="closeDeleteAlbumModal()">
+                    <button class="ip-modal-close" onclick="closeDeleteAlbumModal()">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <div class="album-modal-body">
-                    <p class="album-delete-text">Are you sure you want to delete "<span id="deleteAlbumName"></span>"? This action cannot be undone!</p>
+                <div class="ip-modal-body">
+                    <p class="ip-modal-confirm-text">Are you sure you want to delete "<span id="deleteAlbumName"></span>"? This
+                        action cannot be undone!</p>
                 </div>
-                <div class="album-modal-footer">
-                    <button class="btn-album-cancel" onclick="closeDeleteAlbumModal()">Cancel</button>
-                    <button class="btn-album-delete" onclick="confirmDeleteAlbum()">
+                <div class="ip-modal-footer">
+                    <button class="btn-ip-modal-cancel" onclick="closeDeleteAlbumModal()">Cancel</button>
+                    <button class="btn-ip-modal-delete" onclick="confirmDeleteAlbum()">
                         <i class="fas fa-trash-alt"></i> Delete
                     </button>
                 </div>
@@ -126,14 +131,25 @@
 }
 else
 {
+    var hasPendingRequest = ViewData["HasPendingRequest"] as bool? ?? false;
+
     <div class="restricted-content">
         <div class="restricted-card">
             <i class="fas fa-lock"></i>
             <h3>This Content is Private</h3>
             <p>You need to be friends with @ViewData["Username"] to view their photos.</p>
-            <button class="btn-add-friend-large" onclick="sendFriendRequest('@profileUserId')">
-                <i class="fas fa-user-plus"></i> Add Friend
-            </button>
+            @if (hasPendingRequest)
+            {
+                <button class="btn-pending-large" disabled>
+                    <i class="fas fa-clock"></i> Pending
+                </button>
+            }
+            else
+            {
+                <button class="btn-add-friend-large" onclick="sendFriendRequest('@profileUserId')">
+                    <i class="fas fa-user-plus"></i> Add Friend
+                </button>
+            }
         </div>
     </div>
 }

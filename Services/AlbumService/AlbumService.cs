@@ -2,16 +2,19 @@ using ip_connect.DTOs;
 using ip_connect.Exceptions;
 using ip_connect.Models;
 using ip_connect.Repositories.AlbumRepository;
+using ip_connect.Repositories.FriendshipRepository;
 
 namespace ip_connect.Services.Albums
 {
     public class AlbumService : IAlbumService
     {
         private readonly IAlbumRepository _albumRepository;
+        private readonly IFriendshipRepository _friendshipRepository;
 
-        public AlbumService(IAlbumRepository albumRepository)
+        public AlbumService(IAlbumRepository albumRepository, IFriendshipRepository friendshipRepository)
         {
             _albumRepository = albumRepository;
+            _friendshipRepository = friendshipRepository;
         }
 
         // Get all albums for a user
@@ -128,6 +131,33 @@ namespace ip_connect.Services.Albums
             }
 
             await _albumRepository.DeleteAsync(albumId);
+        }
+
+        public async Task<AlbumDto> GetAlbumByIdAsync(int albumId, string currentUserId)
+        {
+            var album = await _albumRepository.GetAlbumByIdAsync(albumId);
+
+            if (album == null)
+                throw new NotFoundException("Album not found");
+
+            // Check if user has access (owner or friend)
+            if (album.UserId != currentUserId)
+            {
+                var areFriends = await _friendshipRepository.AreFriendsAsync(currentUserId, album.UserId);
+                if (!areFriends)
+                    throw new ForbiddenException("You don't have access to this album");
+            }
+
+            return new AlbumDto
+            {
+                Id = album.Id,
+                UserId = album.UserId,
+                Name = album.Name,
+                Description = album.Description,
+                CreatedAt = album.CreatedAt,
+                //This will be populated later when we add Photos
+                PhotoCount = 0
+            };
         }
     }
 }
