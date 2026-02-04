@@ -21,6 +21,7 @@ using ip_connect.Services.FriendshipService;
 using ip_connect.Services.NotificationService;
 using ip_connect.Services.Albums;
 using ip_connect.Repositories.AlbumRepository;
+using ip_connect.Services.BlobStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,6 +98,7 @@ builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<IFriendshipService, FriendshipService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IAlbumService, AlbumService>();
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
 // Add SignalR
 builder.Services.AddSignalR();

@@ -52,7 +52,7 @@ namespace ip_connect.Services.AccountService
                 UserName = registerDto.UserName,
                 Email = registerDto.Email,
                 CreatedAt = DateTime.UtcNow,
-                ProfilePictureUrl = "/images/default-avatar.jpg"
+                ProfilePictureUrl = "https://ipconnectstorage.blob.core.windows.net/profile-pictures/profile-default.jpg"
             };
 
             // Create user with password (Identity will hash it automatically)
