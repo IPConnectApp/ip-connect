@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using ip_connect.Services.BlobStorage;
 
 //This controller will be changed
 namespace ip_connect.Controllers
@@ -17,12 +18,14 @@ namespace ip_connect.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserProfileService _profileService;
         private readonly IFriendshipService _friendshipService;
+        private readonly IBlobStorageService _blobStorageService;
 
-        public ProfileController(UserManager<ApplicationUser> userManager, IFriendshipService friendshipService, IUserProfileService profileService)
+        public ProfileController(UserManager<ApplicationUser> userManager, IFriendshipService friendshipService, IUserProfileService profileService, IBlobStorageService blobStorageService)
         {
             _userManager = userManager;
             _friendshipService = friendshipService;
             _profileService = profileService;
+            _blobStorageService = blobStorageService;
         }
 
         // /profile → Redirects to logged-in user's profile
@@ -122,12 +125,14 @@ namespace ip_connect.Controllers
         // GET: /profile/{username}/settings
         public async Task<IActionResult> Settings(string username)
         {
+            Console.WriteLine("🟢 Settings page loaded");
             var user = await _userManager.FindByNameAsync(username);
             if (user == null) return NotFound();
 
 
             // Взимаме DTO от сървиса
-            var profileDto = await _profileService.GetOrCreateProfileAsync(user.Id, user.UserName);
+            var displayName = user.UserName ?? username;
+            var profileDto = await _profileService.GetOrCreateProfileAsync(user.Id, displayName);
 
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -143,61 +148,66 @@ namespace ip_connect.Controllers
             return View(profileDto);
         }
 
-        // POST: Update Info
+
+        // POST: Update both avatar AND profile info
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateInfo(UserProfileDto model)
-        {
-            if (!ModelState.IsValid)
-            {
-                // Връщаме грешките
-                ViewData["Username"] = User.Identity?.Name;
-                ViewData["CurrentTab"] = "Settings";
-                return View("Settings", model);
-            }
-
-            await _profileService.UpdateProfileAsync(model);
-
-            TempData["SuccessMessage"] = "Profile information updated successfully!";
-            return RedirectToAction("Settings");
-        }
-
-        // POST: Update Avatar
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateAvatar(IFormFile avatarFile)
+        public async Task<IActionResult> UpdateSettings(UserProfileDto model, IFormFile? avatarFile)
         {
             var username = User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(username))
+                return Unauthorized();
+
             var user = await _userManager.FindByNameAsync(username);
             if (user == null) return NotFound();
 
+            // Update profile info
+            if (ModelState.IsValid)
+            {
+                await _profileService.UpdateProfileAsync(model);
+            }
+
+            // Update avatar if provided
             if (avatarFile != null && avatarFile.Length > 0)
             {
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                var extension = Path.GetExtension(avatarFile.FileName).ToLowerInvariant();
 
-                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
-
-                Directory.CreateDirectory(uploadsFolder);
-
-                string uniqueFileName = Guid.NewGuid().ToString() + "_" + avatarFile.FileName;
-                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                // 2. Запазваме файла на диска
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                if (!allowedExtensions.Contains(extension))
                 {
-                    await avatarFile.CopyToAsync(fileStream);
+                    TempData["ErrorMessage"] = "Invalid file type.";
+                    return RedirectToAction("Settings", new { username });
                 }
 
-                // 3. Обновяваме URL-а в базата чрез Сървиса
-                string newPhotoUrl = "/images/" + uniqueFileName;
-                await _profileService.UpdateProfilePictureAsync(user.Id, newPhotoUrl);
+                if (avatarFile.Length > 5 * 1024 * 1024)
+                {
+                    TempData["ErrorMessage"] = "File too large. Max 5MB.";
+                    return RedirectToAction("Settings", new { username });
+                }
 
-                TempData["SuccessMessage"] = "Profile picture updated!";
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Please select a valid image file.";
+                try
+                {
+                    if (!string.IsNullOrEmpty(user.ProfilePictureUrl) &&
+                        !user.ProfilePictureUrl.Contains("/images/default-avatar.jpg"))
+                    {
+                        await _blobStorageService.DeleteFileAsync(user.ProfilePictureUrl);
+                    }
+
+                    using (var stream = avatarFile.OpenReadStream())
+                    {
+                        var imageUrl = await _blobStorageService.UploadProfilePictureAsync(stream, avatarFile.FileName);
+                        await _profileService.UpdateProfilePictureAsync(user.Id, imageUrl);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["ErrorMessage"] = $"Error uploading image: {ex.Message}";
+                    return RedirectToAction("Settings", new { username });
+                }
             }
 
+            TempData["SuccessMessage"] = "Settings updated successfully!";
             return RedirectToAction("Settings", new { username });
         }
     }

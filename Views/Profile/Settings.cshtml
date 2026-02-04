@@ -28,29 +28,30 @@
         </div>
     }
 
-    <div class="settings-card">
-        <h3><i class="fas fa-camera"></i> Profile Picture</h3>
-        <form asp-action="UpdateAvatar" asp-controller="Profile" method="post" enctype="multipart/form-data">
+    <form asp-action="UpdateSettings" asp-controller="Profile" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="UserId" />
+        <input type="hidden" asp-for="Id" />
+
+        <div class="settings-card">
+            <h3><i class="fas fa-camera"></i> Profile Picture</h3>
             <div class="avatar-section">
-                <img src="@(Model.ProfilePictureUrl ?? "/images/default-avatar.jpg")" class="current-avatar" />
+                <img src="@(Model.ProfilePictureUrl ?? "/images/default-avatar.jpg")" class="current-avatar"
+                    id="avatarPreview" />
 
                 <div>
                     <label for="avatarFile" class="file-upload-btn">
-                        <i class="fas fa-upload"></i> Change Photo
+                        <i class="fas fa-upload"></i> Choose Photo
                     </label>
-                    <input type="file" id="avatarFile" name="avatarFile" accept="image/*" onchange="this.form.submit()" />
-                    <p class="text-muted mt-2" style="font-size: 0.9em;">Click to upload (Auto-save)</p>
+                    <input type="file" id="avatarFile" name="avatarFile" accept="image/*"
+                        onchange="previewAvatar(event)" />
+                    <p class="text-muted mt-2" style="font-size: 0.9em;" id="fileName">No file chosen</p>
                 </div>
             </div>
-        </form>
-    </div>
+        </div>
 
-    <div class="settings-card">
-        <h3><i class="fas fa-user-edit"></i> Personal Information</h3>
-
-        <form asp-action="UpdateInfo" asp-controller="Profile" method="post">
-            <input type="hidden" asp-for="UserId" />
-            <input type="hidden" asp-for="Id" />
+        <div class="settings-card">
+            <h3><i class="fas fa-user-edit"></i> Personal Information</h3>
 
             <div class="row">
                 <div class="col-md-6">
@@ -88,30 +89,43 @@
             <button type="submit" class="btn-save-settings">
                 <i class="fas fa-save"></i> Save Changes
             </button>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
 
 
 @section Scripts {
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             var alertBox = document.getElementById("successAlert");
 
-
             if (alertBox) {
-
-                setTimeout(function() {
-
+                setTimeout(function () {
                     alertBox.style.transition = "opacity 0.5s ease";
                     alertBox.style.opacity = "0";
 
-
-                    setTimeout(function() {
+                    setTimeout(function () {
                         alertBox.style.display = "none";
                     }, 500);
                 }, 10000);
             }
         });
+
+        function previewAvatar(event) {
+            const file = event.target.files[0];
+            const fileName = document.getElementById('fileName');
+            const preview = document.getElementById('avatarPreview');
+
+            if (file) {
+                fileName.textContent = file.name;
+                fileName.style.color = '#2D6A4F';
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
     </script>
 }
