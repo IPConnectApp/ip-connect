@@ -1,0 +1,26 @@
+name: Run Unit Tests
+
+on:
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+    
+    - name: Restore
+      run: dotnet restore src/ip-connect/ip-connect.csproj
+    
+    - name: Build
+      run: dotnet build src/ip-connect/ip-connect.csproj --no-restore
+    
+    - name: Run Tests
+      run: dotnet test tests/ip-connect.Tests/ip-connect.Tests.csproj --no-build --verbosity normal

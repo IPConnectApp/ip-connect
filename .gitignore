@@ -5,32 +5,32 @@
 *.sln.docstates
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-build/
-bld/
-[Bb]in/
-[Oo]bj/
+**/[Dd]ebug/
+**/[Dd]ebugPublic/
+**/[Rr]elease/
+**/[Rr]eleases/
+**/x64/
+**/x86/
+**/build/
+**/bld/
+**/[Bb]in/
+**/[Oo]bj/
 
 # Visual Studio cache/options directory
-.vs/
+**/.vs/
 
 # MSTest test Results
-[Tt]est[Rr]esult*/
-[Bb]uild[Ll]og.*
+**/[Tt]est[Rr]esult*/
+**/[Bb]uild[Ll]og.*
 
 # NuGet Packages
 *.nupkg
 **/packages/*
 
 # Azure secrets
-appsettings.Development.json
-appsettings.*.json
-!appsettings.json
+**/appsettings.Development.json
+**/appsettings.*.json
+!**/appsettings.json
 
 # Database
 *.mdf
