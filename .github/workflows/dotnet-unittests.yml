@@ -17,13 +17,10 @@ jobs:
         dotnet-version: '9.0.x'
     
     - name: Restore
-      run: dotnet restore src/ip-connect/ip-connect.csproj
+      run: dotnet restore
     
     - name: Build
-      run: dotnet build src/ip-connect/ip-connect.csproj --no-restore
-    
-    - name: Build Tests                           # ADD THIS STEP
-      run: dotnet build tests/ip-connect.Tests/ip-connect.Tests.csproj --no-restore
+      run: dotnet build --no-restore
     
     - name: Run Tests
-      run: dotnet test tests/ip-connect.Tests/ip-connect.Tests.csproj --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal
