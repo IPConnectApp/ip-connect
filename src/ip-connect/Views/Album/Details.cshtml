@@ -1,6 +1,7 @@
 @{
-    ViewData["Title"] = "Album Details";
+    ViewData["Title"] = ViewData["AlbumName"] ?? "Album Details";
     Layout = "_ProfileLayout";
+    var isOwnProfile = (bool)(ViewData["IsOwnProfile"] ?? false);
 }
 
 <div class="album-details-container">
@@ -9,17 +10,36 @@
             <i class="fas fa-arrow-left"></i> Back
         </button>
         <div class="album-details-info">
-            <h1 id="albumName"></h1>
+            <h1 id="albumName">Loading...</h1>
             <p id="albumDescription" class="album-description"></p>
             <span id="albumDate" class="album-date"></span>
         </div>
     </div>
 
+    @if (isOwnProfile)
+    {
+        <div class="upload-section">
+            <div id="dropZone" class="upload-dropzone">
+                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                <h3>Drag & Drop photos here</h3>
+                <p>or</p>
+                <label for="photoInput" class="btn-upload">
+                    <i class="fas fa-folder-open"></i> Browse Files
+                </label>
+                <input type="file" id="photoInput" multiple accept="image/*" hidden>
+            </div>
+            <div id="uploadProgress" class="upload-progress" style="display: none;">
+                <div class="progress-bar-container">
+                    <div id="progressBar" class="progress-bar"></div>
+                </div>
+                <span id="progressText">Uploading...</span>
+            </div>
+        </div>
+    }
+
     <div class="album-photos-grid" id="photosGrid">
-        <!-- Петър will implement photo upload and display here -->
-        <div class="album-placeholder">
-            <i class="fas fa-images"></i>
-            <h3>Photos Coming Soon</h3>
+        <div class="album-loading">
+            <i class="fas fa-spinner fa-spin"></i> Loading photos...
         </div>
     </div>
 </div>
@@ -28,38 +48,16 @@
     <link rel="stylesheet" href="~/css/profile/album-details.css" />
 }
 
+
 @section Scripts {
     <script>
-        const albumId = @ViewData["AlbumId"];
-        
-        // Load album details
-        async function loadAlbumDetails() {
-            try {
-                const response = await fetch(`/api/album/${albumId}`);
-                
-                if (!response.ok) {
-                    throw new Error('Failed to load album');
-                }
-                
-                const album = await response.json();
-                
-                document.getElementById('albumName').textContent = album.name;
-                document.getElementById('albumDescription').textContent = album.description || 'No description';
-                
-                const date = new Date(album.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-                document.getElementById('albumDate').textContent = `Created ${date}`;
-                
-            } catch (error) {
-                console.error('Error loading album:', error);
-                alert('Failed to load album');
-                history.back();
-            }
-        }
-        
-        document.addEventListener('DOMContentLoaded', loadAlbumDetails);
+        // Config passed from Razor
+        window.albumConfig = {
+            albumId: @ViewData["AlbumId"],
+            isOwnProfile: @(isOwnProfile.ToString().ToLower())
+        };
+
+        console.log('Album Config:', window.albumConfig); // За debug
     </script>
+    <script src="~/js/profile/album-details.js"></script>
 }

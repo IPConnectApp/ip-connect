@@ -1,4 +1,4 @@
-using ip_connect.DTOs;
+﻿using ip_connect.DTOs;
 using ip_connect.Exceptions;
 using ip_connect.Services.Albums;
 using ip_connect.Services.FriendshipService;
@@ -11,7 +11,7 @@ namespace ip_connect.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class AlbumController : Controller
+    public class AlbumController : ControllerBase
     {
         private readonly IAlbumService _albumService;
         private readonly IFriendshipService _friendshipService;
@@ -48,7 +48,7 @@ namespace ip_connect.Controllers
             return Ok(albums);
         }
 
-        // GET: api/album/{albumId}
+        // GET: api/album/{albumId} - Returns JSON
         [HttpGet("{albumId}")]
         public async Task<IActionResult> GetAlbum(int albumId)
         {
@@ -60,7 +60,7 @@ namespace ip_connect.Controllers
             }
             catch (ForbiddenException)
             {
-                return Forbid();
+                return StatusCode(403, new { error = "Access denied" });
             }
             catch (NotFoundException ex)
             {
