@@ -1,13 +1,27 @@
-/* Album Details Page */
+/* ========================================
+   IP Connect - Album Details Styles
+   Uses existing design system variables
+   ======================================== */
 
+/* ========================================
+   Album Details Container
+   ======================================== */
 .album-details-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: var(--spacing-xl);
 }
 
+/* ========================================
+   Album Header
+   ======================================== */
 .album-details-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
     margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--gray-200);
 }
 
 .btn-back {
@@ -17,42 +31,41 @@
     padding: var(--spacing-sm) var(--spacing-lg);
     border-radius: var(--radius-md);
     font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
     transition: var(--transition-normal);
-    margin-bottom: var(--spacing-lg);
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-xs);
 }
 
-.btn-back:hover {
-    background: var(--gray-300);
+    .btn-back:hover {
+        background: var(--gray-300);
+        transform: translateX(-2px);
+    }
+
+.album-details-info {
+    flex: 1;
 }
 
-.album-details-info h1 {
-    font-size: var(--font-size-xxl);
-    color: var(--gray-900);
-    margin-bottom: var(--spacing-sm);
-}
+    .album-details-info h1 {
+        font-size: var(--font-size-3xl);
+        color: var(--primary-dark);
+        margin: 0 0 var(--spacing-sm) 0;
+    }
 
 .album-description {
     font-size: var(--font-size-lg);
     color: var(--gray-600);
-    margin-bottom: var(--spacing-xs);
-
+    margin: var(--spacing-sm) 0;
+    line-height: var(--line-height-relaxed);
     /* Multi-line ellipsis */
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-
-    /* Fallback for non-webkit browsers */
     max-height: 4.5em;
-    /* Approximately 3 lines */
-    line-height: 1.5em;
-
-    /* CRITICAL: Force word breaking */
     word-wrap: break-word;
     word-break: break-word;
     max-width: 100%;
@@ -61,73 +74,12 @@
 .album-date {
     font-size: var(--font-size-sm);
     color: var(--gray-500);
-}
-
-.album-photos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: var(--spacing-lg);
-}
-
-.album-placeholder {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: var(--spacing-xxl);
-    color: var(--gray-500);
-}
-
-.album-placeholder i {
-    font-size: 64px;
-    color: var(--gray-400);
-    margin-bottom: var(--spacing-lg);
-}
-
-.album-placeholder h3 {
-    color: var(--gray-700);
-    font-size: var(--font-size-xl);
-    margin-bottom: var(--spacing-sm);
-}
-
-.album-placeholder p {
-    color: var(--gray-600);
-    font-size: var(--font-size-md);
-}
-
-
-/* Album Details Layout */
-.album-details-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: var(--spacing-xl);
-}
-
-.album-details-header {
-    margin-bottom: var(--spacing-xl);
-    border-bottom: 2px solid var(--gray-200);
-    padding-bottom: var(--spacing-lg);
-}
-
-/* Header Text */
-.album-details-info h1 {
-    font-size: var(--font-size-3xl);
-    color: var(--primary-dark);
-    margin-top: var(--spacing-md);
-}
-
-.album-description {
-    font-size: var(--font-size-lg);
-    color: var(--gray-600);
-    margin: var(--spacing-sm) 0;
-    line-height: var(--line-height-relaxed);
-}
-
-.album-date {
-    font-size: var(--font-size-sm);
-    color: var(--gray-500);
     font-style: italic;
 }
 
-/* Upload Dropzone */
+/* ========================================
+   Upload Section (Owner Only)
+   ======================================== */
 .upload-section {
     margin-bottom: var(--spacing-xxl);
 }
@@ -142,45 +94,67 @@
     cursor: pointer;
 }
 
-    .upload-dropzone:hover, .upload-dropzone.drag-over {
+    .upload-dropzone:hover,
+    .upload-dropzone.drag-over {
         border-color: var(--primary-color);
-        background: rgba(82, 183, 136, 0.1); /* transparent primary */
+        background: var(--accent-mint);
+        transform: scale(1.01);
     }
 
 .upload-icon {
     font-size: 48px;
-    color: var(--gray-400);
+    color: var(--primary-color);
     margin-bottom: var(--spacing-md);
 }
 
+.upload-dropzone h3 {
+    margin: 0 0 var(--spacing-xs) 0;
+    font-size: var(--font-size-xl);
+    color: var(--gray-900);
+}
+
+.upload-dropzone p {
+    color: var(--gray-600);
+    margin: var(--spacing-xs) 0;
+    font-size: var(--font-size-base);
+}
+
 .btn-upload {
-    display: inline-block;
-    background: var(--primary-color);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background: var(--gradient-primary);
     color: var(--white);
-    padding: 8px 20px;
+    padding: var(--spacing-sm) var(--spacing-lg);
     border-radius: var(--radius-md);
     cursor: pointer;
     font-weight: var(--font-weight-semibold);
     transition: var(--transition-normal);
+    margin-top: var(--spacing-sm);
+    border: none;
 }
 
     .btn-upload:hover {
-        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
     }
 
 /* Progress Bar */
 .upload-progress {
-    margin-top: var(--spacing-md);
-    text-align: center;
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
 }
 
 .progress-bar-container {
     width: 100%;
-    height: 10px;
+    height: 8px;
     background-color: var(--gray-300);
     border-radius: var(--radius-sm);
     overflow: hidden;
-    margin-bottom: 5px;
+    margin-bottom: var(--spacing-sm);
 }
 
 .progress-bar {
@@ -188,96 +162,509 @@
     height: 100%;
     background: var(--gradient-primary);
     transition: width 0.3s ease;
+    border-radius: var(--radius-sm);
 }
 
-/* Photos Grid */
+#progressText {
+    display: block;
+    text-align: center;
+    color: var(--gray-700);
+    font-size: var(--font-size-sm);
+}
+
+/* ========================================
+   Photos Grid
+   ======================================== */
 .album-photos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
 }
 
-.photo-card {
+/* Loading State */
+.album-loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--gray-500);
+    font-size: var(--font-size-lg);
+}
+
+    .album-loading i {
+        font-size: 48px;
+        margin-bottom: var(--spacing-md);
+        display: block;
+        color: var(--primary-color);
+    }
+
+/* ========================================
+   Photo Item
+   ======================================== */
+.photo-item {
     position: relative;
-    aspect-ratio: 1; /* Square photos */
+    aspect-ratio: 1;
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    cursor: pointer;
     background: var(--gray-200);
+    cursor: pointer;
+    transition: var(--transition-normal);
+    box-shadow: var(--shadow-sm);
 }
 
-    .photo-card img {
+    .photo-item:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .photo-item img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.3s ease;
+        display: block;
     }
 
-    .photo-card:hover img {
-        transform: scale(1.05);
+    /* Drag & Drop Styles (Owner Only) */
+    .photo-item.draggable {
+        cursor: grab;
     }
 
-/* Lightbox Modal */
+        .photo-item.draggable:active {
+            cursor: grabbing;
+        }
+
+    .photo-item.dragging {
+        opacity: 0.5;
+        transform: scale(0.95);
+    }
+
+    .photo-item.drag-over {
+        border: 3px solid var(--primary-color);
+        background: var(--accent-mint);
+    }
+
+/* Delete Button (Owner Only) */
+.photo-delete-btn {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--danger);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: var(--transition-normal);
+    z-index: 10;
+    font-size: var(--font-size-sm);
+}
+
+.photo-item:hover .photo-delete-btn {
+    opacity: 1;
+}
+
+.photo-delete-btn:hover {
+    background: #c82333;
+    transform: scale(1.1);
+}
+
+/* Drag Handle (Owner Only) */
+.photo-drag-handle {
+    position: absolute;
+    top: var(--spacing-sm);
+    left: var(--spacing-sm);
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: rgba(0, 0, 0, 0.6);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: var(--transition-normal);
+    cursor: grab;
+    z-index: 10;
+    font-size: var(--font-size-sm);
+}
+
+.photo-item:hover .photo-drag-handle {
+    opacity: 1;
+}
+
+.photo-drag-handle:active {
+    cursor: grabbing;
+}
+
+/* ========================================
+   Lightbox Modal
+   ======================================== */
 .lightbox-modal {
-    display: none;
     position: fixed;
-    z-index: 2000;
-    left: 0;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.9);
-    flex-direction: column;
-    justify-content: center;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: var(--z-modal);
+    display: none;
     align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
 }
 
 .lightbox-content {
-    margin: auto;
-    display: block;
-    max-width: 90%;
-    max-height: 80vh;
-    border-radius: var(--radius-sm);
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
+
+    .lightbox-content img {
+        max-width: 100%;
+        max-height: 85vh;
+        object-fit: contain;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-xl);
+    }
 
 .lightbox-close {
     position: absolute;
-    top: 15px;
-    right: 35px;
-    color: #f1f1f1;
-    font-size: 40px;
-    font-weight: bold;
+    top: 20px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    font-size: var(--font-size-2xl);
     cursor: pointer;
-    transition: 0.3s;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-normal);
 }
 
     .lightbox-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
         color: var(--danger);
     }
 
-.lightbox-delete-btn {
-    margin-top: 20px;
-    background: transparent;
-    border: 1px solid var(--danger);
-    color: var(--danger);
-    padding: 10px 20px;
-    border-radius: var(--radius-md);
+.lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    font-size: var(--font-size-2xl);
     cursor: pointer;
-    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-normal);
+    z-index: 10000;
 }
 
-    .lightbox-delete-btn:hover {
-        background: var(--danger);
-        color: white;
+    .lightbox-nav:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-50%) scale(1.1);
     }
 
-/* Empty State */
-.album-empty {
+    .lightbox-nav:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+
+.lightbox-prev {
+    left: 20px;
+}
+
+.lightbox-next {
+    right: 20px;
+}
+
+.lightbox-info {
+    margin-top: var(--spacing-md);
+    text-align: center;
+}
+
+#lightboxCounter {
+    color: var(--white);
+    font-size: var(--font-size-sm);
+    background: rgba(0, 0, 0, 0.5);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-xl);
+    display: inline-block;
+}
+
+/* ========================================
+   Empty State
+   ======================================== */
+.empty-photos {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 50px;
+    padding: var(--spacing-xxl);
     color: var(--gray-500);
 }
+
+    .empty-photos i {
+        font-size: 64px;
+        margin-bottom: var(--spacing-lg);
+        color: var(--gray-400);
+    }
+
+    .empty-photos h3 {
+        margin: 0 0 var(--spacing-sm) 0;
+        font-size: var(--font-size-2xl);
+        color: var(--gray-700);
+    }
+
+    .empty-photos p {
+        margin: 0;
+        font-size: var(--font-size-md);
+        color: var(--gray-600);
+    }
+
+/* ========================================
+   Modal Overlay (Delete Confirmation)
+   ======================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: var(--z-modal-backdrop);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+}
+
+.ip-modal {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    max-width: 500px;
+    width: 100%;
+    animation: modalSlideIn 0.3s ease;
+}
+
+.ip-modal-small {
+    max-width: 400px;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ip-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--gray-300);
+}
+
+    .ip-modal-header h3 {
+        margin: 0;
+        font-size: var(--font-size-xl);
+        color: var(--gray-900);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+    }
+
+.ip-modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-500);
+    transition: var(--transition-normal);
+}
+
+    .ip-modal-close:hover {
+        background: var(--gray-100);
+        color: var(--gray-900);
+    }
+
+.ip-modal-body {
+    padding: var(--spacing-lg);
+}
+
+.ip-modal-confirm-text {
+    margin: 0;
+    font-size: var(--font-size-base);
+    color: var(--gray-700);
+    line-height: var(--line-height-relaxed);
+}
+
+.ip-modal-footer {
+    display: flex;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg);
+    border-top: 1px solid var(--gray-300);
+    justify-content: flex-end;
+}
+
+.btn-ip-modal-cancel,
+.btn-ip-modal-delete {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-base);
+    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.btn-ip-modal-cancel {
+    background: var(--gray-200);
+    color: var(--gray-800);
+}
+
+    .btn-ip-modal-cancel:hover {
+        background: var(--gray-300);
+    }
+
+.btn-ip-modal-delete {
+    background: var(--danger);
+    color: var(--white);
+}
+
+    .btn-ip-modal-delete:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+@media (max-width: 768px) {
+    .album-details-container {
+        padding: var(--spacing-md);
+    }
+
+    .album-details-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+    }
+
+    .album-details-info h1 {
+        font-size: var(--font-size-2xl);
+    }
+
+    .album-photos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: var(--spacing-md);
+    }
+
+    .upload-dropzone {
+        padding: var(--spacing-xl);
+    }
+
+    .upload-icon {
+        font-size: 36px;
+    }
+
+    .lightbox-nav {
+        width: 48px;
+        height: 48px;
+        font-size: var(--font-size-xl);
+    }
+
+    .lightbox-prev {
+        left: 10px;
+    }
+
+    .lightbox-next {
+        right: 10px;
+    }
+
+    .lightbox-close {
+        width: 40px;
+        height: 40px;
+        font-size: var(--font-size-xl);
+        top: 10px;
+        right: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .album-photos-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
+    }
+
+    .btn-back {
+        padding: var(--spacing-xs) var(--spacing-md);
+        font-size: var(--font-size-sm);
+    }
+
+    .upload-dropzone h3 {
+        font-size: var(--font-size-lg);
+    }
+}
+
+/* ========================================
+   Additional Utilities
+   ======================================== */
+.album-placeholder {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--gray-500);
+}
+
+    .album-placeholder i {
+        font-size: 64px;
+        color: var(--gray-400);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .album-placeholder h3 {
+        color: var(--gray-700);
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .album-placeholder p {
+        color: var(--gray-600);
+        font-size: var(--font-size-md);
+    }

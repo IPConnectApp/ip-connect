@@ -6,19 +6,14 @@ namespace ip_connect.Models
     public class Photo
     {
         public int Id { get; set; }
-
-        [Required]
-        public string Url { get; set; } = string.Empty;
-
-        // Опционално, ако в бъдеще правиш ресайз на снимки
-        public string? ThumbnailUrl { get; set; }
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        // Foreign Key към Album
+        public string PhotoUrl { get; set; }
         public int AlbumId { get; set; }
+        public string UserId { get; set; }
+        public int DisplayOrder { get; set; } // ADD THIS IF MISSING
+        public DateTime UploadedAt { get; set; }
 
-        [ForeignKey(nameof(AlbumId))]
-        public Album? Album { get; set; }
+        // Navigation properties
+        public Album Album { get; set; }
+        public ApplicationUser User { get; set; }
     }
 }

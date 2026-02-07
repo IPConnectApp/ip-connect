@@ -12,8 +12,8 @@ using ip_connect.Data;
 namespace ip_connect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260206211128_InitialWithAlbums")]
-    partial class InitialWithAlbums
+    [Migration("20260207114930_intial-added-photos")]
+    partial class intialaddedphotos
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -436,6 +436,40 @@ namespace ip_connect.Migrations
                     b.ToTable("Notifications");
                 });
 
+            modelBuilder.Entity("ip_connect.Models.Photo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AlbumId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhotoUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlbumId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Photos");
+                });
+
             modelBuilder.Entity("ip_connect.Models.UserProfile", b =>
                 {
                     b.Property<int>("Id")
@@ -626,6 +660,25 @@ namespace ip_connect.Migrations
                         .IsRequired();
 
                     b.Navigation("RelatedUser");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ip_connect.Models.Photo", b =>
+                {
+                    b.HasOne("ip_connect.Models.Album", "Album")
+                        .WithMany()
+                        .HasForeignKey("AlbumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ip_connect.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Album");
 
                     b.Navigation("User");
                 });

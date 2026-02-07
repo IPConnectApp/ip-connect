@@ -35,13 +35,13 @@ namespace ip_connect.Services.Photos
 
             var photos = await _context.Photos
                 .Where(p => p.AlbumId == albumId)
-                .OrderByDescending(p => p.CreatedAt)
+                .OrderByDescending(p => p.UploadedAt)
                 .Select(p => new PhotoDto
                 {
                     Id = p.Id,
-                    Url = p.Url,
-                    ThumbnailUrl = p.ThumbnailUrl ?? p.Url, // Fallback
-                    CreatedAt = p.CreatedAt
+                    Url = p.PhotoUrl,
+                    ThumbnailUrl = p.PhotoUrl ?? p.PhotoUrl, // Fallback
+                    CreatedAt = p.UploadedAt
                 })
                 .ToListAsync();
 
@@ -66,9 +66,8 @@ namespace ip_connect.Services.Photos
             var photo = new Photo
             {
                 AlbumId = albumId,
-                Url = fileUrl,
-                ThumbnailUrl = fileUrl, // За сега е същото
-                CreatedAt = DateTime.UtcNow
+                PhotoUrl = fileUrl, // За сега е същото
+                UploadedAt = DateTime.UtcNow
             };
 
             _context.Photos.Add(photo);
@@ -81,9 +80,9 @@ namespace ip_connect.Services.Photos
             return new PhotoDto
             {
                 Id = photo.Id,
-                Url = photo.Url,
-                ThumbnailUrl = photo.ThumbnailUrl,
-                CreatedAt = photo.CreatedAt
+                Url = photo.PhotoUrl,
+                ThumbnailUrl = photo.PhotoUrl,
+                CreatedAt = photo.UploadedAt
             };
         }
 
@@ -102,11 +101,38 @@ namespace ip_connect.Services.Photos
             }
 
             // 1. Изтриване на файла физически
-            _fileService.DeleteFile(photo.Url);
+            _fileService.DeleteFile(photo.PhotoUrl);
 
             // 2. Изтриване от базата
             _context.Photos.Remove(photo);
             await _context.SaveChangesAsync();
+        }
+        public async Task ReorderPhotosAsync(List<PhotoReorderDto> reorderList, string userId)
+        {
+            foreach (var item in reorderList)
+            {
+                var photo = await _context.Photos.FindAsync(item.Id);
+
+                if (photo == null)
+                {
+                    throw new NotFoundException($"Photo with ID {item.Id} not found");
+                }
+
+                if (photo.UserId != userId)
+                {
+                    throw new ForbiddenException("You don't have permission to reorder this photo");
+                }
+
+                photo.DisplayOrder = item.DisplayOrder;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Photo> GetPhotoByIdAsync(int id, string userId)
+        {
+            var photo = await _context.Photos.FindAsync(id);
+            return photo;
         }
     }
 }

@@ -101,5 +101,38 @@ namespace ip_connect.Controllers
                 return StatusCode(403, new { error = ex.Message });
             }
         }
+
+        // PUT: api/photo/reorder
+        [HttpPut("reorder")]
+        public async Task<IActionResult> ReorderPhotos([FromBody] List<PhotoReorderDto> reorderList)
+        {
+            var userId = GetCurrentUserId();
+
+            try
+            {
+                // Verify user owns all photos being reordered
+                foreach (var item in reorderList)
+                {
+                    var photo = await _photoService.GetPhotoByIdAsync(item.Id, userId);
+                    if (photo.UserId != userId)
+                    {
+                        return Forbid();
+                    }
+                }
+
+                // Update display order
+                await _photoService.ReorderPhotosAsync(reorderList, userId);
+
+                return Ok(new { message = "Photos reordered successfully" });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Failed to reorder photos" });
+            }
+        }
     }
 }
