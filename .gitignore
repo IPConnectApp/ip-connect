@@ -23,6 +23,9 @@
 **/[Tt]est[Rr]esult*/
 **/[Bb]uild[Ll]og.*
 
+**/TestResults/
+**/coveragereport/
+
 # NuGet Packages
 *.nupkg
 **/packages/*
