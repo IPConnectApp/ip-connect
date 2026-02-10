@@ -45,7 +45,7 @@ namespace ip_connect.Tests.ServiceTests
             // Assert
             result.Should().NotBeNull();
             result.Id.Should().Be(10);
-            result.ConversationId.Should().Be(1);
+            result.ConversationId.Should().Be(2);
             result.SenderId.Should().Be("user1");
             result.SenderUsername.Should().Be("alice");
             result.Text.Should().Be("Hello world");
