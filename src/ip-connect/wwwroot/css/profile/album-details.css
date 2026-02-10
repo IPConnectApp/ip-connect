@@ -1,480 +1,145 @@
-/* ========================================
-   IP Connect - Album Details Styles
-   Uses existing design system variables
-   ======================================== */
+/* IP Connect - Album Details Styles (Reworked) */
 
-/* ========================================
-   Album Details Container
-   ======================================== */
+/* Container */
 .album-details-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: var(--spacing-xl);
+    padding-bottom: var(--spacing-xxl);
 }
 
-/* ========================================
-   Album Header
-   ======================================== */
-.album-details-header {
+/* Header Section (Matching albums.css header) */
+.album-header-section {
     display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
+    justify-content: space-between;
+    align-items: flex-start;
     margin-bottom: var(--spacing-xl);
     padding-bottom: var(--spacing-lg);
     border-bottom: 2px solid var(--gray-200);
+    gap: var(--spacing-lg);
 }
 
-.btn-back {
-    background: var(--gray-200);
-    color: var(--gray-700);
-    border: none;
-    padding: var(--spacing-sm) var(--spacing-lg);
-    border-radius: var(--radius-md);
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-semibold);
-    cursor: pointer;
-    transition: var(--transition-normal);
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-}
-
-    .btn-back:hover {
-        background: var(--gray-300);
-        transform: translateX(-2px);
-    }
-
-.album-details-info {
+.album-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
     flex: 1;
 }
 
-    .album-details-info h1 {
-        font-size: var(--font-size-3xl);
-        color: var(--primary-dark);
-        margin: 0 0 var(--spacing-sm) 0;
-    }
+.album-nav-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
 
-.album-description {
-    font-size: var(--font-size-lg);
+.btn-back-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-full);
     color: var(--gray-600);
-    margin: var(--spacing-sm) 0;
-    line-height: var(--line-height-relaxed);
-    /* Multi-line ellipsis */
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-height: 4.5em;
-    word-wrap: break-word;
-    word-break: break-word;
-    max-width: 100%;
-}
-
-.album-date {
-    font-size: var(--font-size-sm);
-    color: var(--gray-500);
-    font-style: italic;
-}
-
-/* ========================================
-   Upload Section (Owner Only)
-   ======================================== */
-.upload-section {
-    margin-bottom: var(--spacing-xxl);
-}
-
-.upload-dropzone {
-    border: 3px dashed var(--gray-300);
-    border-radius: var(--radius-lg);
-    padding: 40px;
-    text-align: center;
-    background: var(--gray-100);
     transition: var(--transition-normal);
     cursor: pointer;
+    text-decoration: none;
 }
 
-    .upload-dropzone:hover,
-    .upload-dropzone.drag-over {
-        border-color: var(--primary-color);
-        background: var(--accent-mint);
-        transform: scale(1.01);
+    .btn-back-icon:hover {
+        background: var(--gray-100);
+        color: var(--primary-color);
+        transform: translateX(-3px);
+        box-shadow: var(--shadow-sm);
     }
 
-.upload-icon {
-    font-size: 48px;
-    color: var(--primary-color);
-    margin-bottom: var(--spacing-md);
-}
-
-.upload-dropzone h3 {
-    margin: 0 0 var(--spacing-xs) 0;
-    font-size: var(--font-size-xl);
+.album-title {
+    font-size: var(--font-size-3xl);
     color: var(--gray-900);
+    margin: 0;
+    line-height: var(--line-height-tight);
 }
 
-.upload-dropzone p {
-    color: var(--gray-600);
-    margin: var(--spacing-xs) 0;
-    font-size: var(--font-size-base);
+.album-meta-info {
+    display: flex;
+    gap: var(--spacing-lg);
+    color: var(--gray-500);
+    font-size: var(--font-size-sm);
+    margin-top: var(--spacing-xs);
 }
 
-.btn-upload {
-    display: inline-flex;
+.album-meta-item {
+    display: flex;
     align-items: center;
     gap: var(--spacing-xs);
-    background: var(--gradient-primary);
-    color: var(--white);
-    padding: var(--spacing-sm) var(--spacing-lg);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-weight: var(--font-weight-semibold);
-    transition: var(--transition-normal);
-    margin-top: var(--spacing-sm);
-    border: none;
 }
 
-    .btn-upload:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-    }
-
-/* Progress Bar */
-.upload-progress {
-    margin-top: var(--spacing-lg);
+.album-description-box {
+    margin-top: var(--spacing-md);
     padding: var(--spacing-md);
-    background: var(--white);
+    background: var(--gray-100);
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-}
-
-.progress-bar-container {
-    width: 100%;
-    height: 8px;
-    background-color: var(--gray-300);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    margin-bottom: var(--spacing-sm);
-}
-
-.progress-bar {
-    width: 0%;
-    height: 100%;
-    background: var(--gradient-primary);
-    transition: width 0.3s ease;
-    border-radius: var(--radius-sm);
-}
-
-#progressText {
-    display: block;
-    text-align: center;
+    border-left: 4px solid var(--primary-color);
     color: var(--gray-700);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-relaxed);
 }
 
-/* ========================================
-   Photos Grid
-   ======================================== */
-.album-photos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: var(--spacing-lg);
-    margin-top: var(--spacing-lg);
+/* Header Actions */
+.album-header-actions {
+    display: flex;
+    gap: var(--spacing-sm);
 }
 
-/* Loading State */
-.album-loading {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: var(--spacing-xxl);
-    color: var(--gray-500);
-    font-size: var(--font-size-lg);
-}
-
-    .album-loading i {
-        font-size: 48px;
-        margin-bottom: var(--spacing-md);
-        display: block;
-        color: var(--primary-color);
-    }
-
-/* ========================================
-   Photo Item
-   ======================================== */
-.photo-item {
-    position: relative;
-    aspect-ratio: 1;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    background: var(--gray-200);
+.btn-action-outline {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border: 1px solid var(--gray-300);
+    background: var(--white);
+    color: var(--gray-700);
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
     transition: var(--transition-normal);
-    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
 }
 
-    .photo-item:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-lg);
-    }
-
-    .photo-item img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-
-    /* Drag & Drop Styles (Owner Only) */
-    .photo-item.draggable {
-        cursor: grab;
-    }
-
-        .photo-item.draggable:active {
-            cursor: grabbing;
-        }
-
-    .photo-item.dragging {
-        opacity: 0.5;
-        transform: scale(0.95);
-    }
-
-    .photo-item.drag-over {
-        border: 3px solid var(--primary-color);
+    .btn-action-outline:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
         background: var(--accent-mint);
     }
 
-/* Delete Button (Owner Only) */
-.photo-delete-btn {
-    position: absolute;
-    top: var(--spacing-sm);
-    right: var(--spacing-sm);
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius-full);
-    background: var(--danger);
-    color: var(--white);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: var(--transition-normal);
-    z-index: 10;
-    font-size: var(--font-size-sm);
-}
-
-.photo-item:hover .photo-delete-btn {
-    opacity: 1;
-}
-
-.photo-delete-btn:hover {
-    background: #c82333;
-    transform: scale(1.1);
-}
-
-/* Drag Handle (Owner Only) */
-.photo-drag-handle {
-    position: absolute;
-    top: var(--spacing-sm);
-    left: var(--spacing-sm);
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius-full);
-    background: rgba(0, 0, 0, 0.6);
-    color: var(--white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: var(--transition-normal);
-    cursor: grab;
-    z-index: 10;
-    font-size: var(--font-size-sm);
-}
-
-.photo-item:hover .photo-drag-handle {
-    opacity: 1;
-}
-
-.photo-drag-handle:active {
-    cursor: grabbing;
-}
-
-/* ========================================
-   Lightbox Modal
-   ======================================== */
-.lightbox-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.95);
-    z-index: var(--z-modal);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: var(--spacing-lg);
-}
-
-.lightbox-content {
-    position: relative;
-    max-width: 90vw;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-    .lightbox-content img {
-        max-width: 100%;
-        max-height: 85vh;
-        object-fit: contain;
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow-xl);
-    }
-
-.lightbox-close {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius-full);
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--white);
-    font-size: var(--font-size-2xl);
-    cursor: pointer;
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: var(--transition-normal);
-}
-
-    .lightbox-close:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: scale(1.1);
-        color: var(--danger);
-    }
-
-.lightbox-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 56px;
-    height: 56px;
-    border-radius: var(--radius-full);
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--white);
-    font-size: var(--font-size-2xl);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: var(--transition-normal);
-    z-index: 10000;
-}
-
-    .lightbox-nav:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateY(-50%) scale(1.1);
-    }
-
-    .lightbox-nav:disabled {
-        opacity: 0.3;
-        cursor: not-allowed;
-    }
-
-.lightbox-prev {
-    left: 20px;
-}
-
-.lightbox-next {
-    right: 20px;
-}
-
-.lightbox-info {
-    margin-top: var(--spacing-md);
-    text-align: center;
-}
-
-#lightboxCounter {
-    color: var(--white);
-    font-size: var(--font-size-sm);
-    background: rgba(0, 0, 0, 0.5);
-    padding: var(--spacing-xs) var(--spacing-md);
-    border-radius: var(--radius-xl);
-    display: inline-block;
-}
-
-/* ========================================
-   Empty State
-   ======================================== */
-.empty-photos {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: var(--spacing-xxl);
-    color: var(--gray-500);
-}
-
-    .empty-photos i {
-        font-size: 64px;
-        margin-bottom: var(--spacing-lg);
-        color: var(--gray-400);
-    }
-
-    .empty-photos h3 {
-        margin: 0 0 var(--spacing-sm) 0;
-        font-size: var(--font-size-2xl);
-        color: var(--gray-700);
-    }
-
-    .empty-photos p {
-        margin: 0;
-        font-size: var(--font-size-md);
-        color: var(--gray-600);
-    }
-
-/* ========================================
-   Modal Overlay (Delete Confirmation)
-   ======================================== */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: var(--z-modal-backdrop);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--spacing-lg);
-}
-
-.ip-modal {
+.btn-action-danger {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border: 1px solid var(--danger);
     background: var(--white);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-xl);
-    max-width: 500px;
-    width: 100%;
-    animation: modalSlideIn 0.3s ease;
+    color: var(--danger);
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
 }
 
-.ip-modal-small {
-    max-width: 400px;
+    .btn-action-danger:hover {
+        background: var(--danger);
+        color: var(--white);
+    }
+
+/* Upload Section (Modern Dropzone) */
+.upload-container {
+    margin-bottom: var(--spacing-xl);
+    animation: slideDown 0.4s ease;
 }
 
-@keyframes modalSlideIn {
+@keyframes slideDown {
     from {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(-10px);
     }
 
     to {
@@ -483,188 +148,235 @@
     }
 }
 
-.ip-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--spacing-lg);
-    border-bottom: 1px solid var(--gray-300);
-}
-
-    .ip-modal-header h3 {
-        margin: 0;
-        font-size: var(--font-size-xl);
-        color: var(--gray-900);
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-xs);
-    }
-
-.ip-modal-close {
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius-full);
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--gray-500);
+.dropzone-area {
+    background: var(--white);
+    border: 2px dashed var(--gray-300);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    text-align: center;
     transition: var(--transition-normal);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
 
-    .ip-modal-close:hover {
-        background: var(--gray-100);
-        color: var(--gray-900);
+    .dropzone-area:hover,
+    .dropzone-area.drag-over {
+        border-color: var(--primary-color);
+        background: var(--accent-mint);
+        transform: scale(1.005);
     }
 
-.ip-modal-body {
-    padding: var(--spacing-lg);
-}
-
-.ip-modal-confirm-text {
-    margin: 0;
-    font-size: var(--font-size-base);
-    color: var(--gray-700);
-    line-height: var(--line-height-relaxed);
-}
-
-.ip-modal-footer {
+.dropzone-content {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-lg);
-    border-top: 1px solid var(--gray-300);
-    justify-content: flex-end;
+    z-index: 2;
+    position: relative;
 }
 
-.btn-ip-modal-cancel,
-.btn-ip-modal-delete {
-    padding: var(--spacing-sm) var(--spacing-lg);
-    border-radius: var(--radius-md);
-    border: none;
-    cursor: pointer;
-    font-weight: var(--font-weight-semibold);
-    font-size: var(--font-size-base);
-    transition: var(--transition-normal);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
+.dropzone-icon {
+    font-size: 48px;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: var(--spacing-sm);
 }
 
-.btn-ip-modal-cancel {
-    background: var(--gray-200);
+.dropzone-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
     color: var(--gray-800);
 }
 
-    .btn-ip-modal-cancel:hover {
-        background: var(--gray-300);
-    }
+.dropzone-subtitle {
+    color: var(--gray-500);
+    font-size: var(--font-size-sm);
+}
 
-.btn-ip-modal-delete {
-    background: var(--danger);
+.btn-select-files {
+    margin-top: var(--spacing-md);
+    background: var(--gradient-secondary);
     color: var(--white);
+    border: none;
+    padding: var(--spacing-sm) var(--spacing-xl);
+    border-radius: var(--radius-full);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: var(--transition-normal);
+    box-shadow: var(--shadow-sm);
 }
 
-    .btn-ip-modal-delete:hover {
-        background: #c82333;
+    .btn-select-files:hover {
         transform: translateY(-2px);
-        box-shadow: var(--shadow-sm);
+        box-shadow: var(--shadow-md);
+        filter: brightness(1.05);
     }
 
-/* ========================================
-   Responsive Design
-   ======================================== */
-@media (max-width: 768px) {
-    .album-details-container {
-        padding: var(--spacing-md);
-    }
-
-    .album-details-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--spacing-md);
-    }
-
-    .album-details-info h1 {
-        font-size: var(--font-size-2xl);
-    }
-
-    .album-photos-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: var(--spacing-md);
-    }
-
-    .upload-dropzone {
-        padding: var(--spacing-xl);
-    }
-
-    .upload-icon {
-        font-size: 36px;
-    }
-
-    .lightbox-nav {
-        width: 48px;
-        height: 48px;
-        font-size: var(--font-size-xl);
-    }
-
-    .lightbox-prev {
-        left: 10px;
-    }
-
-    .lightbox-next {
-        right: 10px;
-    }
-
-    .lightbox-close {
-        width: 40px;
-        height: 40px;
-        font-size: var(--font-size-xl);
-        top: 10px;
-        right: 10px;
-    }
+/* Upload Progress Bar */
+.upload-status-bar {
+    margin-top: var(--spacing-md);
+    background: var(--white);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    display: none; /* Hidden by default */
 }
 
-@media (max-width: 480px) {
-    .album-photos-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--spacing-sm);
-    }
-
-    .btn-back {
-        padding: var(--spacing-xs) var(--spacing-md);
-        font-size: var(--font-size-sm);
-    }
-
-    .upload-dropzone h3 {
-        font-size: var(--font-size-lg);
-    }
+.progress-track {
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-bottom: var(--spacing-xs);
 }
 
-/* ========================================
-   Additional Utilities
-   ======================================== */
-.album-placeholder {
+.progress-fill {
+    height: 100%;
+    background: var(--gradient-primary);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: var(--font-size-xs);
+    color: var(--gray-600);
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Photos Grid */
+.photos-masonry {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.photo-card {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    aspect-ratio: 1;
+    background: var(--gray-200);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-normal);
+    cursor: zoom-in;
+    border: 1px solid var(--gray-300);
+}
+
+    .photo-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-color);
+    }
+
+    .photo-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .photo-card:hover img {
+        transform: scale(1.05);
+    }
+
+/* Photo Actions Overlay */
+.photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: var(--transition-fast);
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: var(--spacing-sm);
+}
+
+.photo-card:hover .photo-overlay {
+    opacity: 1;
+}
+
+.btn-photo-action {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    background: var(--white);
+    color: var(--gray-700);
+    margin-left: var(--spacing-xs);
+}
+
+    .btn-photo-action:hover {
+        transform: scale(1.1);
+    }
+
+    .btn-photo-action.delete:hover {
+        background: var(--danger);
+        color: var(--white);
+    }
+
+/* Loading State */
+.gallery-loader {
     grid-column: 1 / -1;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     padding: var(--spacing-xxl);
     color: var(--gray-500);
 }
 
-    .album-placeholder i {
-        font-size: 64px;
-        color: var(--gray-400);
-        margin-bottom: var(--spacing-lg);
+    .gallery-loader i {
+        font-size: 32px;
+        color: var(--primary-color);
+        margin-bottom: var(--spacing-md);
     }
 
-    .album-placeholder h3 {
-        color: var(--gray-700);
-        font-size: var(--font-size-xl);
-        margin-bottom: var(--spacing-sm);
+/* Empty State */
+.empty-gallery {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--gray-100);
+    border-radius: var(--radius-lg);
+    border: 1px dashed var(--gray-300);
+}
+
+.empty-gallery-icon {
+    font-size: 64px;
+    color: var(--gray-300);
+    margin-bottom: var(--spacing-md);
+}
+
+.empty-gallery h3 {
+    color: var(--gray-600);
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .album-header-section {
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    .album-placeholder p {
-        color: var(--gray-600);
-        font-size: var(--font-size-md);
+    .album-header-actions {
+        justify-content: flex-start;
+        padding-top: var(--spacing-md);
+        border-top: 1px solid var(--gray-200);
     }
+
+    .photos-masonry {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: var(--spacing-md);
+    }
+}
