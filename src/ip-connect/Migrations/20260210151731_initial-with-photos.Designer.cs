@@ -12,8 +12,8 @@ using ip_connect.Data;
 namespace ip_connect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260207114930_intial-added-photos")]
-    partial class intialaddedphotos
+    [Migration("20260210151731_initial-with-photos")]
+    partial class initialwithphotos
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -572,7 +572,7 @@ namespace ip_connect.Migrations
                     b.HasOne("ip_connect.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");

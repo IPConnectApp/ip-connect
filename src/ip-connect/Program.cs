@@ -9,6 +9,7 @@ using ip_connect.Repositories.FriendshipRepository;
 using ip_connect.Repositories.MessageRepository;
 using ip_connect.Repositories.Messages;
 using ip_connect.Repositories.NotificationRepository;
+using ip_connect.Repositories.PhotoRepository;
 using ip_connect.Repositories.UserProfileRepository;
 using ip_connect.Services.AccountService;
 using ip_connect.Services.Albums;
@@ -89,6 +90,7 @@ builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 builder.Services.AddScoped<IFriendshipRepository, FriendshipRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IAlbumRepository, AlbumRepository>();
+builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
 
 // Register Services
 builder.Services.AddScoped<IUserService, UserService>();

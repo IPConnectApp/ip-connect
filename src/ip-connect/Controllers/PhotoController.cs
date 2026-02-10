@@ -1,4 +1,4 @@
-﻿using ip_connect.Dtos.Photo;
+using ip_connect.Dtos.Photo;
 using ip_connect.Exceptions;
 using ip_connect.Services.Photos;
 using Microsoft.AspNetCore.Authorization;
@@ -10,13 +10,15 @@ namespace ip_connect.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class PhotoController : ControllerBase
+    public class PhotoController : Controller
     {
         private readonly IPhotoService _photoService;
+        private readonly ILogger<PhotoController> _logger;
 
-        public PhotoController(IPhotoService photoService)
+        public PhotoController(IPhotoService photoService, ILogger<PhotoController> logger)
         {
             _photoService = photoService;
+            _logger = logger;
         }
 
         private string GetCurrentUserId()
@@ -25,7 +27,10 @@ namespace ip_connect.Controllers
                 ?? throw new UnauthorizedAccessException("User not authenticated");
         }
 
-        // 1. GET: api/photo/album/{albumId}
+        /// <summary>
+        /// Get all photos for a specific album
+        /// GET: api/photo/album/{albumId}
+        /// </summary>
         [HttpGet("album/{albumId}")]
         public async Task<IActionResult> GetPhotos(int albumId)
         {
@@ -43,30 +48,57 @@ namespace ip_connect.Controllers
             {
                 return StatusCode(403, new { error = ex.Message });
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error getting photos for album {albumId}");
+                return StatusCode(500, new { error = "An error occurred while retrieving photos" });
+            }
         }
 
-        // 2. POST: api/photo/upload
+        /// <summary>
+        /// Upload multiple photos to an album
+        /// POST: api/photo/upload
+        /// </summary>
         [HttpPost("upload")]
         public async Task<IActionResult> UploadPhotos([FromForm] List<IFormFile> files, [FromForm] int albumId)
         {
-            if (files == null || files.Count == 0)
-                return BadRequest("No files received");
-
-            var userId = GetCurrentUserId();
-            var uploadedPhotos = new List<PhotoDto>();
-
             try
             {
+                if (files == null || !files.Any())
+                {
+                    return BadRequest(new { error = "No files provided" });
+                }
+
+                var userId = GetCurrentUserId();
+                var uploadedPhotos = new List<PhotoDto>();
+
                 foreach (var file in files)
                 {
                     if (file.Length > 0)
                     {
-                        var photoDto = await _photoService.UploadPhotoAsync(albumId, file, userId);
-                        uploadedPhotos.Add(photoDto);
+                        try
+                        {
+                            var photoDto = await _photoService.UploadPhotoAsync(albumId, file, userId);
+                            uploadedPhotos.Add(photoDto);
+                        }
+                        catch (BadRequestException ex)
+                        {
+                            _logger.LogWarning($"Failed to upload file {file.FileName}: {ex.Message}");
+                            // Continue with other files
+                        }
                     }
                 }
 
-                return Ok(uploadedPhotos);
+                if (!uploadedPhotos.Any())
+                {
+                    return BadRequest(new { error = "No files were successfully uploaded" });
+                }
+
+                return Ok(new
+                {
+                    message = $"{uploadedPhotos.Count} photo(s) uploaded successfully",
+                    photos = uploadedPhotos
+                });
             }
             catch (NotFoundException ex)
             {
@@ -78,11 +110,15 @@ namespace ip_connect.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = "Internal server error: " + ex.Message });
+                _logger.LogError(ex, "Error uploading photos");
+                return StatusCode(500, new { error = "An error occurred while uploading photos" });
             }
         }
 
-        // 3. DELETE: api/photo/{id}
+        /// <summary>
+        /// Delete a photo
+        /// DELETE: api/photo/{id}
+        /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePhoto(int id)
         {
@@ -100,27 +136,28 @@ namespace ip_connect.Controllers
             {
                 return StatusCode(403, new { error = ex.Message });
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting photo {id}");
+                return StatusCode(500, new { error = "An error occurred while deleting the photo" });
+            }
         }
 
-        // PUT: api/photo/reorder
+        /// <summary>
+        /// Reorder photos in an album
+        /// PUT: api/photo/reorder
+        /// </summary>
         [HttpPut("reorder")]
         public async Task<IActionResult> ReorderPhotos([FromBody] List<PhotoReorderDto> reorderList)
         {
-            var userId = GetCurrentUserId();
-
             try
             {
-                // Verify user owns all photos being reordered
-                foreach (var item in reorderList)
+                if (reorderList == null || !reorderList.Any())
                 {
-                    var photo = await _photoService.GetPhotoByIdAsync(item.Id, userId);
-                    if (photo.UserId != userId)
-                    {
-                        return Forbid();
-                    }
+                    return BadRequest(new { error = "Reorder list cannot be empty" });
                 }
 
-                // Update display order
+                var userId = GetCurrentUserId();
                 await _photoService.ReorderPhotosAsync(reorderList, userId);
 
                 return Ok(new { message = "Photos reordered successfully" });
@@ -129,9 +166,18 @@ namespace ip_connect.Controllers
             {
                 return NotFound(new { error = ex.Message });
             }
+            catch (ForbiddenException ex)
+            {
+                return StatusCode(403, new { error = ex.Message });
+            }
+            catch (BadRequestException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = "Failed to reorder photos" });
+                _logger.LogError(ex, "Error reordering photos");
+                return StatusCode(500, new { error = "An error occurred while reordering photos" });
             }
         }
     }
