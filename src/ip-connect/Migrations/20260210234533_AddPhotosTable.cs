@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ip_connect.Migrations
 {
     /// <inheritdoc />
-    public partial class initialwithphotos : Migration
+    public partial class AddPhotosTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -294,11 +294,12 @@ namespace ip_connect.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhotoUrl = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: false),
                     AlbumId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false),
-                    UploadedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    UploadedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    AlbumId1 = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -310,11 +311,16 @@ namespace ip_connect.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Photos_Albums_AlbumId1",
+                        column: x => x.AlbumId1,
+                        principalTable: "Albums",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_Photos_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -467,6 +473,11 @@ namespace ip_connect.Migrations
                 name: "IX_Photos_AlbumId",
                 table: "Photos",
                 column: "AlbumId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Photos_AlbumId1",
+                table: "Photos",
+                column: "AlbumId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Photos_UserId",

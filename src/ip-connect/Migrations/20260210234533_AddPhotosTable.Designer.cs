@@ -12,8 +12,8 @@ using ip_connect.Data;
 namespace ip_connect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260210151731_initial-with-photos")]
-    partial class initialwithphotos
+    [Migration("20260210234533_AddPhotosTable")]
+    partial class AddPhotosTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -447,15 +447,21 @@ namespace ip_connect.Migrations
                     b.Property<int>("AlbumId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("AlbumId1")
+                        .HasColumnType("int");
+
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
 
                     b.Property<string>("PhotoUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.Property<DateTime>("UploadedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -464,6 +470,8 @@ namespace ip_connect.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AlbumId");
+
+                    b.HasIndex("AlbumId1");
 
                     b.HasIndex("UserId");
 
@@ -672,10 +680,14 @@ namespace ip_connect.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ip_connect.Models.Album", null)
+                        .WithMany("Photos")
+                        .HasForeignKey("AlbumId1");
+
                     b.HasOne("ip_connect.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Album");
@@ -692,6 +704,11 @@ namespace ip_connect.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ip_connect.Models.Album", b =>
+                {
+                    b.Navigation("Photos");
                 });
 
             modelBuilder.Entity("ip_connect.Models.ApplicationUser", b =>
