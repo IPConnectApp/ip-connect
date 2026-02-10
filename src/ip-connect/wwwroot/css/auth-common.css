@@ -125,3 +125,7 @@ body {
 .alert ul {
     padding-left: var(--spacing-lg);
 }
+
+.form-check .form-check-input {
+    margin-left: 0 !important;
+}
