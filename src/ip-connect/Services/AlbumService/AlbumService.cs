@@ -1,4 +1,4 @@
-using ip_connect.DTOs;
+﻿using ip_connect.DTOs;
 using ip_connect.Exceptions;
 using ip_connect.Models;
 using ip_connect.Repositories.AlbumRepository;
@@ -29,18 +29,30 @@ namespace ip_connect.Services.Albums
                 Name = a.Name,
                 Description = a.Description,
                 CreatedAt = a.CreatedAt,
-                //This will be populated later when we add Photos
-                PhotoCount = 0,
-                //This will be populated later when we add cover photos
-                CoverPhotoUrl = null
+
+                PhotoCount = a.Photos?.Count ?? 0,
+                CoverPhotoUrl = a.Photos?
+                    .OrderBy(p => p.UploadedAt)
+                    .Select(p => p.PhotoUrl)
+                    .FirstOrDefault()
             }).ToList();
         }
 
         // Get a single album by ID
-        public async Task<AlbumDto?> GetAlbumByIdAsync(int albumId)
+        public async Task<AlbumDto> GetAlbumByIdAsync(int albumId, string currentUserId)
         {
-            var album = await _albumRepository.GetByIdAsync(albumId);
-            if (album == null) return null;
+            var album = await _albumRepository.GetAlbumByIdAsync(albumId);
+
+            if (album == null)
+                throw new NotFoundException("Album not found");
+
+            // Access control...
+            if (album.UserId != currentUserId)
+            {
+                var areFriends = await _friendshipRepository.AreFriendsAsync(currentUserId, album.UserId);
+                if (!areFriends)
+                    throw new ForbiddenException("You don't have access to this album");
+            }
 
             return new AlbumDto
             {
@@ -49,8 +61,12 @@ namespace ip_connect.Services.Albums
                 Name = album.Name,
                 Description = album.Description,
                 CreatedAt = album.CreatedAt,
-                PhotoCount = 0,
-                CoverPhotoUrl = null
+
+                PhotoCount = album.Photos?.Count ?? 0,
+                CoverPhotoUrl = album.Photos?
+                    .OrderBy(p => p.UploadedAt)
+                    .Select(p => p.PhotoUrl)
+                    .FirstOrDefault()
             };
         }
 
@@ -111,8 +127,11 @@ namespace ip_connect.Services.Albums
                 Name = updatedAlbum.Name,
                 Description = updatedAlbum.Description,
                 CreatedAt = updatedAlbum.CreatedAt,
-                PhotoCount = 0,
-                CoverPhotoUrl = null
+                PhotoCount = updatedAlbum.Photos?.Count ?? 0,
+                CoverPhotoUrl = updatedAlbum.Photos?
+                    .OrderBy(p => p.UploadedAt)
+                    .Select(p => p.PhotoUrl)
+                    .FirstOrDefault()
             };
         }
 
@@ -133,31 +152,5 @@ namespace ip_connect.Services.Albums
             await _albumRepository.DeleteAsync(albumId);
         }
 
-        public async Task<AlbumDto> GetAlbumByIdAsync(int albumId, string currentUserId)
-        {
-            var album = await _albumRepository.GetAlbumByIdAsync(albumId);
-
-            if (album == null)
-                throw new NotFoundException("Album not found");
-
-            // Check if user has access (owner or friend)
-            if (album.UserId != currentUserId)
-            {
-                var areFriends = await _friendshipRepository.AreFriendsAsync(currentUserId, album.UserId);
-                if (!areFriends)
-                    throw new ForbiddenException("You don't have access to this album");
-            }
-
-            return new AlbumDto
-            {
-                Id = album.Id,
-                UserId = album.UserId,
-                Name = album.Name,
-                Description = album.Description,
-                CreatedAt = album.CreatedAt,
-                //This will be populated later when we add Photos
-                PhotoCount = 0
-            };
-        }
     }
 }

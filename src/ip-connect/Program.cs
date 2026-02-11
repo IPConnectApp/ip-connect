@@ -2,26 +2,29 @@ using ip_connect.Data;
 using ip_connect.Hubs;
 using ip_connect.Middleware;
 using ip_connect.Models;
+using ip_connect.Repositories.AlbumRepository;
 using ip_connect.Repositories.ConversationMemberRepository;
 using ip_connect.Repositories.ConversationRepository;
+using ip_connect.Repositories.FriendshipRepository;
 using ip_connect.Repositories.MessageRepository;
 using ip_connect.Repositories.Messages;
+using ip_connect.Repositories.NotificationRepository;
+using ip_connect.Repositories.PhotoRepository;
 using ip_connect.Repositories.UserProfileRepository;
 using ip_connect.Services.AccountService;
+using ip_connect.Services.Albums;
+using ip_connect.Services.BlobStorage;
 using ip_connect.Services.ConversationService;
 using ip_connect.Services.Email;
+using ip_connect.Services.Files;
+using ip_connect.Services.FriendshipService;
 using ip_connect.Services.MessageService;
+using ip_connect.Services.NotificationService;
+using ip_connect.Services.Photos;
 using ip_connect.Services.UserProfileService;
 using ip_connect.Services.UserService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using ip_connect.Repositories.FriendshipRepository;
-using ip_connect.Repositories.NotificationRepository;
-using ip_connect.Services.FriendshipService;
-using ip_connect.Services.NotificationService;
-using ip_connect.Services.Albums;
-using ip_connect.Repositories.AlbumRepository;
-using ip_connect.Services.BlobStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,6 +90,7 @@ builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 builder.Services.AddScoped<IFriendshipRepository, FriendshipRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IAlbumRepository, AlbumRepository>();
+builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
 
 // Register Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -99,6 +103,8 @@ builder.Services.AddScoped<IFriendshipService, FriendshipService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IAlbumService, AlbumService>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IPhotoService, PhotoService>();
 
 // Add SignalR
 builder.Services.AddSignalR();
@@ -135,7 +141,7 @@ app.MapRazorPages()
 
 app.MapControllerRoute(
     name: "profile",
-    pattern: "profile/{username}/{action=Photos}",
+    pattern: "profile/{username}/{action=Albums}",
     defaults: new { controller = "Profile" });
 
 app.MapControllerRoute(

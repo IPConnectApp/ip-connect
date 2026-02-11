@@ -1,4 +1,4 @@
-/* IP Connect - Albums Styles */
+/* IP Connect - Albums Styles (Enhanced with Cover Images) */
 
 /* Tab Header Row */
 .tab-header-row {
@@ -23,10 +23,10 @@
     gap: var(--spacing-xs);
 }
 
-.btn-create-album:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
+    .btn-create-album:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
 
 /* Albums Container */
 .albums-container {
@@ -51,23 +51,38 @@
     cursor: pointer;
 }
 
-.album-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--primary-color);
-}
+    .album-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-color);
+    }
 
-/* Album Cover (placeholder until Петър adds photos) */
+/* Album Cover - Enhanced to show images */
 .album-card-cover {
     width: 100%;
     height: 180px;
-    background: var(--gradient-secondary);
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
+    position: relative;
+    background: var(--gradient-secondary);
 }
 
-.album-card-cover i {
+/* Cover Image - actual photo */
+.album-cover-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.album-card:hover .album-cover-image {
+    transform: scale(1.1);
+}
+
+/* Placeholder icon when no photos */
+.album-cover-placeholder {
     font-size: 48px;
     color: var(--white);
     opacity: 0.8;
@@ -83,6 +98,9 @@
     font-weight: var(--font-weight-semibold);
     color: var(--gray-900);
     margin-bottom: var(--spacing-xs);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .album-card-description {
@@ -93,19 +111,33 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    line-height: var(--line-height-normal);
+    min-height: 32px; /* Reserve space even if empty */
 }
 
 .album-card-meta {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: var(--spacing-xs);
     margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--gray-200);
 }
 
 .album-card-photos,
 .album-card-date {
     font-size: var(--font-size-xs);
     color: var(--gray-500);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
 }
+
+    .album-card-photos i,
+    .album-card-date i {
+        font-size: var(--font-size-sm);
+        color: var(--primary-color);
+    }
 
 /* Album Card Actions (Edit, Delete) */
 .album-card-actions {
@@ -114,6 +146,7 @@
     right: var(--spacing-sm);
     display: none;
     gap: var(--spacing-xs);
+    z-index: 10;
 }
 
 .album-card:hover .album-card-actions {
@@ -132,6 +165,7 @@
     justify-content: center;
     transition: var(--transition-normal);
     font-size: var(--font-size-sm);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-album-edit {
@@ -139,18 +173,20 @@
     color: var(--white);
 }
 
-.btn-album-edit:hover {
-    background: var(--primary-dark);
-}
+    .btn-album-edit:hover {
+        background: var(--primary-dark);
+        transform: scale(1.1);
+    }
 
 .btn-album-delete-icon {
     background: var(--danger);
     color: var(--white);
 }
 
-.btn-album-delete-icon:hover {
-    background: #c82333;
-}
+    .btn-album-delete-icon:hover {
+        background: #c82333;
+        transform: scale(1.1);
+    }
 
 /* Empty State */
 .empty-albums {
@@ -159,23 +195,23 @@
     color: var(--gray-500);
 }
 
-.empty-albums i {
-    font-size: 64px;
-    color: var(--gray-400);
-    margin-bottom: var(--spacing-lg);
-}
+    .empty-albums i {
+        font-size: 64px;
+        color: var(--gray-400);
+        margin-bottom: var(--spacing-lg);
+    }
 
-.empty-albums h3 {
-    color: var(--gray-700);
-    font-size: var(--font-size-xl);
-    margin-bottom: var(--spacing-sm);
-}
+    .empty-albums h3 {
+        color: var(--gray-700);
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--spacing-sm);
+    }
 
-.empty-albums p {
-    color: var(--gray-600);
-    font-size: var(--font-size-md);
-    margin-bottom: var(--spacing-lg);
-}
+    .empty-albums p {
+        color: var(--gray-600);
+        font-size: var(--font-size-md);
+        margin-bottom: var(--spacing-lg);
+    }
 
 /* Create Album Button (in empty state) */
 .btn-create-album-empty {
@@ -193,10 +229,10 @@
     gap: var(--spacing-sm);
 }
 
-.btn-create-album-empty:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
+    .btn-create-album-empty:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
 
 /* Responsive */
 
@@ -212,5 +248,9 @@
 
     .album-card-cover {
         height: 130px;
+    }
+
+    .album-cover-placeholder {
+        font-size: 36px;
     }
 }

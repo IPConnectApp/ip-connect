@@ -1,0 +1,110 @@
+@{
+    ViewData["Title"] = ViewData["AlbumName"]?.ToString() ?? "Album Details";
+    ViewData["CurrentTab"] = "Albums";
+    Layout = "_ProfileLayout";
+    var albumId = ViewData["AlbumId"];
+    var isOwnProfile = (bool)(ViewData["IsOwnProfile"] ?? false);
+}
+
+<input type="hidden" id="albumId" value="@albumId" />
+<input type="hidden" id="isOwnProfile" value="@isOwnProfile.ToString().ToLower()" />
+
+<div class="album-details-container">
+
+    <!-- Header Section -->
+    <div class="album-header-section">
+        <div class="album-header-left">
+            <div class="album-nav-row">
+                <a href="javascript:history.back()" class="btn-back-icon" title="Back to Albums">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <h1 class="album-title">@ViewData["AlbumName"]</h1>
+            </div>
+
+            <div class="album-meta-info">
+                <span class="album-meta-item">
+                    <i class="far fa-calendar-alt"></i> Created recently
+                </span>
+                <span class="album-meta-item">
+                    <i class="far fa-images"></i> <span id="photoCountBadge">0 photos</span>
+                </span>
+            </div>
+
+            @if (ViewData["AlbumDescription"] != null && !string.IsNullOrWhiteSpace(ViewData["AlbumDescription"].ToString()))
+            {
+                <div class="album-description-box">
+                    @ViewData["AlbumDescription"]
+                </div>
+            }
+        </div>
+
+    </div>
+
+    <!-- Photos Grid with Drag & Drop Reordering -->
+    <div id="photoGallery" class="photos-masonry">
+        <!-- Photos will be rendered here by JavaScript -->
+    </div>
+    <br />
+
+    <!-- Upload Section (Only for owner) -->
+    @if (isOwnProfile)
+    {
+        <div class="upload-container">
+            <div id="photoDropArea" class="dropzone-area">
+                <div class="dropzone-content">
+                    <i class="fas fa-cloud-upload-alt dropzone-icon"></i>
+                    <h3 class="dropzone-title">Add Photos</h3>
+                    <p class="dropzone-subtitle">Drag & Drop images here or click to browse</p>
+                    <p class="dropzone-subtitle text-muted" style="font-size: 12px;">Supports: JPG, PNG, WEBP (Max 10MB)</p>
+
+                    <button type="button" id="browseFilesBtn" class="btn-select-files">
+                        <i class="fas fa-plus-circle"></i> Select Files
+                    </button>
+                </div>
+
+                <input type="file" id="photoFileInput" multiple accept="image/jpeg,image/png,image/gif,image/webp" hidden />
+            </div>
+
+            <div id="uploadProgress" class="upload-status-bar">
+                <div class="progress-track">
+                    <div class="progress-fill" id="uploadProgressBar"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progressText">Uploading...</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+            </div>
+        </div>
+    }
+
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="gallery-loader" style="display:none;">
+        <i class="fas fa-circle-notch fa-spin"></i>
+        <span>Loading your memories...</span>
+    </div>
+
+</div>
+
+<!-- Lightbox Modal for Full View -->
+<div id="lightboxModal" class="lightbox-modal">
+    <button class="lightbox-close" id="lightboxClose">&times;</button>
+    <button class="lightbox-nav lightbox-prev" id="lightboxPrev"><i class="fas fa-chevron-left"></i></button>
+
+    <div class="lightbox-content">
+        <img id="lightboxImage" src="" alt="Full view" />
+        <div class="lightbox-info">
+            <span id="lightboxCounter"></span>
+        </div>
+    </div>
+
+    <button class="lightbox-nav lightbox-next" id="lightboxNext"><i class="fas fa-chevron-right"></i></button>
+</div>
+
+@section Scripts {
+    <script src="~/js/profile/album-photos.js"></script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile/album-details.css" />
+}

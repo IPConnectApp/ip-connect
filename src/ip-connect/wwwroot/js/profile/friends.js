@@ -111,7 +111,7 @@ function displayFriendsList(friends, container) {
     const isOwnProfile = document.getElementById('isOwnProfile')?.value === 'true';
 
     const friendsHtml = friends.map(friend => `
-        <div class="friend-card" onclick="window.location.href='/profile/${friend.username}/photos'">
+        <div class="friend-card" onclick="window.location.href='/profile/${friend.username}/albums'">
             ${isOwnProfile ? `
                 <button class="btn-remove-friend" onclick="event.stopPropagation(); openRemoveFriendModal('${friend.friendshipId}', '${escapeHtml(friend.username)}')">
                     <i class="fas fa-times"></i>
@@ -123,7 +123,7 @@ function displayFriendsList(friends, container) {
             <div class="friend-name">${escapeHtml(friend.username)}</div>
             <div class="friend-since">Friends since ${formatDate(friend.friendsSince)}</div>
             <div class="friend-actions" onclick="event.stopPropagation()">
-                <button class="btn-view-profile" onclick="window.location.href='/profile/${friend.username}/photos'">
+                <button class="btn-view-profile" onclick="window.location.href='/profile/${friend.username}/albums'">
                     <i class="fas fa-user"></i> Profile
                 </button>
                 ${isOwnProfile ? `

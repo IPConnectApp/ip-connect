@@ -1,13 +1,14 @@
 using ip_connect.Dtos.UserProfile;
 using ip_connect.Models;
-using ip_connect.Services.UserProfileService;
-using System.Security.Claims;
+using ip_connect.Services.Albums;
+using ip_connect.Services.BlobStorage;
 using ip_connect.Services.FriendshipService;
+using ip_connect.Services.UserProfileService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using ip_connect.Services.BlobStorage;
+using System.Security.Claims;
 
 //This controller will be changed
 namespace ip_connect.Controllers
@@ -19,14 +20,18 @@ namespace ip_connect.Controllers
         private readonly IUserProfileService _profileService;
         private readonly IFriendshipService _friendshipService;
         private readonly IBlobStorageService _blobStorageService;
+        private readonly IAlbumService _albumService;
 
-        public ProfileController(UserManager<ApplicationUser> userManager, IFriendshipService friendshipService, IUserProfileService profileService, IBlobStorageService blobStorageService)
+        public ProfileController(UserManager<ApplicationUser> userManager, IFriendshipService friendshipService, IUserProfileService profileService, IBlobStorageService blobStorageService,
+            IAlbumService albumService)
         {
             _userManager = userManager;
             _friendshipService = friendshipService;
             _profileService = profileService;
             _blobStorageService = blobStorageService;
+            _albumService = albumService;
         }
+        private string GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         // /profile → Redirects to logged-in user's profile
         public IActionResult Index()
@@ -35,18 +40,16 @@ namespace ip_connect.Controllers
             return RedirectToAction("Chats", new { username });
         }
 
-        // /profile/{username}/photos
-        public async Task<IActionResult> Photos(string username)
+        // /profile/{username}/albums
+        public async Task<IActionResult> Albums(string username)
         {
             var user = await _userManager.FindByNameAsync(username);
 
-            if (user == null)
-                return NotFound();
+            if (user == null) return NotFound();
 
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUserId = GetCurrentUserId();
 
-            if (string.IsNullOrEmpty(currentUserId))
-                return Unauthorized();
+            if (string.IsNullOrEmpty(currentUserId)) return Unauthorized();
 
             var isOwnProfile = currentUserId == user.Id;
             var areFriends = false;
@@ -59,7 +62,7 @@ namespace ip_connect.Controllers
             }
 
             ViewData["Username"] = username;
-            ViewData["CurrentTab"] = "Photos";
+            ViewData["CurrentTab"] = "Albums";
             ViewData["ProfilePictureUrl"] = user.ProfilePictureUrl ?? "/images/default-avatar.jpg";
             ViewData["IsOwnProfile"] = isOwnProfile;
             ViewData["AreFriends"] = areFriends;
@@ -76,7 +79,7 @@ namespace ip_connect.Controllers
             if (user == null)
                 return NotFound();
 
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUserId = GetCurrentUserId();
 
             if (string.IsNullOrEmpty(currentUserId))
                 return Unauthorized();
@@ -109,7 +112,7 @@ namespace ip_connect.Controllers
             if (user == null)
                 return NotFound();
 
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUserId = GetCurrentUserId();
 
             // Only the owner can view settings
             if (currentUserId != user.Id)
@@ -134,7 +137,7 @@ namespace ip_connect.Controllers
             var displayName = user.UserName ?? username;
             var profileDto = await _profileService.GetOrCreateProfileAsync(user.Id, displayName);
 
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUserId = GetCurrentUserId();
 
             // Only the owner can view settings
             if (currentUserId != user.Id)
@@ -209,6 +212,51 @@ namespace ip_connect.Controllers
 
             TempData["SuccessMessage"] = "Settings updated successfully!";
             return RedirectToAction("Settings", new { username });
+        }
+
+
+        // /profile/album/{albumId} - Album details view
+        [HttpGet("/profile/{username}/albums/{albumId}")]
+        public async Task<IActionResult> Album(string username, int albumId)
+        {
+            var currentUserId = GetCurrentUserId();
+
+            try
+            {
+                var album = await _albumService.GetAlbumByIdAsync(albumId, currentUserId);
+
+                // Get the profile user info for the sidebar
+                var profileUser = await _userManager.FindByNameAsync(username);
+                if (profileUser == null) return NotFound();
+
+                // Check if viewing own profile
+                var isOwnProfile = album.UserId == currentUserId;
+
+                // Check friendship if not own profile
+                var areFriends = false;
+                if (!isOwnProfile)
+                {
+                    var friendshipStatus = await _friendshipService.GetFriendshipStatusAsync(currentUserId, profileUser.Id);
+                    areFriends = friendshipStatus.AreFriends;
+                    ViewData["HasPendingRequest"] = friendshipStatus.HasPendingRequest;
+                }
+
+                ViewData["AlbumId"] = albumId;
+                ViewData["AlbumName"] = album.Name;
+                ViewData["AlbumDescription"] = album.Description;
+                ViewData["IsOwnProfile"] = isOwnProfile;
+                ViewData["AreFriends"] = areFriends;
+                ViewData["Username"] = username;
+                ViewData["CurrentTab"] = "Albums";
+                ViewData["ProfilePictureUrl"] = profileUser.ProfilePictureUrl ?? "/images/default-avatar.jpg";
+                ViewData["ProfileUserId"] = profileUser.Id;
+
+                return View("Album");
+            }
+            catch
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
     }
 }

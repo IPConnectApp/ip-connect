@@ -11,7 +11,7 @@ namespace ip_connect.Data.Configurations
             builder.HasOne(a => a.User)
                 .WithMany()
                 .HasForeignKey(a => a.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasIndex(a => a.UserId);
         }
