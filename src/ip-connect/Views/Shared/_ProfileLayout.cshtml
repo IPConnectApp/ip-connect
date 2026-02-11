@@ -6,7 +6,7 @@
 
 @{
     var username = ViewData["Username"]?.ToString() ?? User.Identity?.Name ?? "";
-    var currentTab = ViewData["CurrentTab"]?.ToString() ?? "Photos";
+    var currentTab = ViewData["CurrentTab"]?.ToString() ?? "Albums";
     var isOwnProfile = ViewData["IsOwnProfile"] as bool? ?? true;
     var areFriends = ViewData["AreFriends"] as bool? ?? false;
     var profilePicUrl = ViewData["ProfilePictureUrl"]?.ToString() ?? "/images/default-avatar.jpg";
@@ -113,8 +113,8 @@
             {
                 <!-- Tab Navigation (only show if friends or own profile) -->
                 <nav class="profile-tabs">
-                    <a href="/profile/@username/photos" class="profile-tab @(currentTab == "Photos" ? "active" : "")">
-                        <i class="fas fa-images"></i> Photos
+                    <a href="/profile/@username/albums" class="profile-tab @(currentTab == "Albums" ? "active" : "")">
+                        <i class="fas fa-images"></i> Albums
                     </a>
                     <a href="/profile/@username/friends" class="profile-tab @(currentTab == "Friends" ? "active" : "")">
                         <i class="fas fa-user-friends"></i> Friends

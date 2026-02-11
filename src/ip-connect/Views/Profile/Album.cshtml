@@ -1,5 +1,6 @@
 @{
     ViewData["Title"] = ViewData["AlbumName"]?.ToString() ?? "Album Details";
+    ViewData["CurrentTab"] = "Albums"; // Highlight Photos tab
     Layout = "_ProfileLayout";
     var albumId = ViewData["AlbumId"];
     var isOwnProfile = (bool)(ViewData["IsOwnProfile"] ?? false);
@@ -113,9 +114,6 @@
 
 @section Scripts {
     <script src="~/js/profile/album-photos.js"></script>
-    <script>
-        // Optional: Inline script to initialize tooltips or specific UI behaviors if needed
-    </script>
 }
 
 @section Styles {

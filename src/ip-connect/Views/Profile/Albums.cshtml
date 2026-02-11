@@ -1,16 +1,17 @@
 @{
-    ViewData["Title"] = "Photos";
+    ViewData["Title"] = "Albums";
     Layout = "_ProfileLayout";
     var isOwnProfile = ViewData["IsOwnProfile"] as bool? ?? false;
     var areFriends = ViewData["AreFriends"] as bool? ?? false;
     var profileUserId = ViewData["ProfileUserId"]?.ToString() ?? "";
+    var username = ViewData["Username"]?.ToString() ?? "";
 }
 
 @if (isOwnProfile || areFriends)
 {
     <div class="tab-content-header">
         <div class="tab-header-row">
-            <h1>Photos</h1>
+            <h1>Albums</h1>
             @if (isOwnProfile)
             {
                 <button class="btn-create-album" onclick="openCreateAlbumModal()">
@@ -165,7 +166,8 @@ else
         // Pass data to albums.js
         window.albumsConfig = {
             isOwnProfile: @Json.Serialize(isOwnProfile),
-            profileUserId: '@profileUserId'
+            profileUserId: '@profileUserId',
+            username: '@username'
         };
     </script>
     <script src="~/js/profile/albums.js"></script>

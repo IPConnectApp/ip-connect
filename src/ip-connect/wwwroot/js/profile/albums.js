@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Only run if albumsConfig exists (we're on the Photos page)
+    // Only run if albumsConfig exists (we're on the Albums page)
     if (!window.albumsConfig) return;
 
     loadAlbums();
@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // Load albums from API
 async function loadAlbums() {
     try {
-        const response = await fetch(`/api/album/user/${window.albumsConfig.profileUserId}`);
+        const response = await fetch(`/api/albums/user/${window.albumsConfig.profileUserId}`);
 
         if (!response.ok) {
             console.error('Failed to load albums:', response.status);
@@ -28,8 +28,7 @@ function renderAlbums(albums) {
     const albumsGrid = document.getElementById('albumsGrid');
     const emptyAlbums = document.getElementById('emptyAlbums');
 
-    if (albums.length === 0)
-    {
+    if (albums.length === 0) {
         // No albums - show empty state
         albumsGrid.style.display = 'none';
         emptyAlbums.style.display = 'block';
@@ -54,11 +53,11 @@ function createAlbumCard(album) {
     const card = document.createElement('div');
     card.className = 'album-card';
 
-    card.addEventListener('click', function(e) {
+    card.addEventListener('click', function (e) {
         if (e.target.closest('.album-card-actions')) {
             return;
         }
-        window.location.href = `/album/${album.id}`;
+        window.location.href = `/profile/${window.albumsConfig.username}/albums/${album.id}`;
     });
 
     const createdDate = new Date(album.createdAt).toLocaleDateString('en-US', {
@@ -122,7 +121,7 @@ async function createAlbum() {
     }
 
     try {
-        const response = await fetch('/api/album', {
+        const response = await fetch('/api/albums', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -151,7 +150,7 @@ async function createAlbum() {
 function openEditAlbumModal(albumId) {
     //Find the album card to get current values
     const cards = document.querySelectorAll('.album-card');
-    
+
     cards.forEach(card => {
         const nameEl = card.querySelector('.album-card-name');
         const descEl = card.querySelector('.album-card-description');
@@ -184,7 +183,7 @@ async function updateAlbum() {
     }
 
     try {
-        const response = await fetch(`/api/album/${albumId}`, {
+        const response = await fetch(`/api/albums/${albumId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -227,7 +226,7 @@ async function confirmDeleteAlbum() {
     if (!albumToDelete) return;
 
     try {
-        const response = await fetch(`/api/album/${albumToDelete}`, {
+        const response = await fetch(`/api/albums/${albumToDelete}`, {
             method: 'DELETE',
             headers: {
                 'RequestVerificationToken': getAntiforgeryToken()

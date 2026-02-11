@@ -141,7 +141,7 @@ app.MapRazorPages()
 
 app.MapControllerRoute(
     name: "profile",
-    pattern: "profile/{username}/{action=Photos}",
+    pattern: "profile/{username}/{action=Albums}",
     defaults: new { controller = "Profile" });
 
 app.MapControllerRoute(

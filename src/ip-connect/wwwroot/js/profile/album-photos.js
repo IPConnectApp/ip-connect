@@ -102,7 +102,7 @@ class AlbumPhotoManager {
             console.log(`🔄 Loading photos for album ${this.albumId}...`);
             this.showLoading(true);
 
-            const response = await fetch(`/api/photo/album/${this.albumId}`, {
+            const response = await fetch(`/api/albums/${this.albumId}/photos`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -152,13 +152,12 @@ class AlbumPhotoManager {
             console.log(`📤 Uploading ${validFiles.length} files to album ${this.albumId}...`);
 
             const formData = new FormData();
-            formData.append('albumId', this.albumId);
 
             validFiles.forEach(file => {
                 formData.append('files', file);
             });
 
-            const response = await fetch('/api/photo/upload', {
+            const response = await fetch(`/api/albums/${this.albumId}/photos`, {
                 method: 'POST',
                 body: formData
             });
@@ -230,7 +229,7 @@ class AlbumPhotoManager {
         try {
             console.log(`🗑️ Deleting photo ${photoId}...`);
 
-            const response = await fetch(`/api/photo/${photoId}`, {
+            const response = await fetch(`/api/albums/photo/${photoId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'

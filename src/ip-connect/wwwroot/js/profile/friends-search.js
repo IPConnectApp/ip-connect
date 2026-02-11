@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Navigate to user profile
     function goToProfile(username) {
-        window.location.href = `/profile/${username}/photos`;
+        window.location.href = `/profile/${username}/albums`;
     }
 
     // Send friend request
