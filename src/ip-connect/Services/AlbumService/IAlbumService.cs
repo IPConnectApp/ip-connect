@@ -8,7 +8,7 @@ namespace ip_connect.Services.Albums
         Task<List<AlbumDto>> GetUserAlbumsAsync(string userId);
 
         // Get a single album by ID
-        Task<AlbumDto?> GetAlbumByIdAsync(int albumId);
+        Task<AlbumDto> GetAlbumByIdAsync(int albumId, string currentUserId);
 
         // Create a new album
         Task<AlbumDto> CreateAlbumAsync(string userId, CreateAlbumDto createDto);
@@ -19,6 +19,5 @@ namespace ip_connect.Services.Albums
         // Delete an album
         Task DeleteAlbumAsync(int albumId, string userId);
 
-        Task<AlbumDto> GetAlbumByIdAsync(int albumId, string currentUserId);
     }
 }

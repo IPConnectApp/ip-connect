@@ -10,11 +10,11 @@ namespace ip_connect.Repositories.AlbumRepository
 
         public async Task<List<Album>> GetUserAlbumsAsync(string userId)
         {
-            return await _dbSet
-                .Include(a => a.User)
-                .Where(a => a.UserId == userId)
-                .OrderByDescending(a => a.CreatedAt)
-                .ToListAsync();
+            return await _context.Albums
+            .Include(a => a.Photos)
+            .Where(a => a.UserId == userId)
+            .OrderByDescending(a => a.CreatedAt)
+            .ToListAsync();
         }
 
         public async Task<bool> IsAlbumOwnerAsync(int albumId, string userId)
@@ -26,7 +26,8 @@ namespace ip_connect.Repositories.AlbumRepository
         public async Task<Album?> GetAlbumByIdAsync(int albumId)
         {
             return await _context.Albums
-                .FirstOrDefaultAsync(a => a.Id == albumId);
+            .Include(a => a.Photos)
+            .FirstOrDefaultAsync(a => a.Id == albumId);
         }
     }
 }

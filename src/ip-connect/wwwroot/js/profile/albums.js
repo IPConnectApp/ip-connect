@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+﻿document.addEventListener('DOMContentLoaded', function () {
     // Only run if albumsConfig exists (we're on the Albums page)
     if (!window.albumsConfig) return;
 
@@ -16,6 +16,7 @@ async function loadAlbums() {
         }
 
         const albums = await response.json();
+        console.log('📦 Albums loaded:', albums);
         renderAlbums(albums);
     }
     catch (error) {
@@ -48,7 +49,7 @@ function renderAlbums(albums) {
     });
 }
 
-//Create album card element
+// Create album card element with cover image
 function createAlbumCard(album) {
     const card = document.createElement('div');
     card.className = 'album-card';
@@ -65,16 +66,33 @@ function createAlbumCard(album) {
         month: 'long'
     });
 
+    // Determine cover content
+    let coverContent;
+    if (album.coverPhotoUrl) {
+        // Show actual cover image
+        coverContent = `<img src="${escapeHtml(album.coverPhotoUrl)}" alt="${escapeHtml(album.name)}" class="album-cover-image" loading="lazy">`;
+    } else {
+        // Show placeholder icon
+        coverContent = `<i class="fas fa-images album-cover-placeholder"></i>`;
+    }
+
+    // Photo count text
+    const photoCountText = album.photoCount === 1 ? '1 photo' : `${album.photoCount} photos`;
+
     card.innerHTML = `
         <div class="album-card-cover">
-            <i class="fas fa-images"></i>
+            ${coverContent}
         </div>
         <div class="album-card-info">
             <h4 class="album-card-name">${escapeHtml(album.name)}</h4>
             ${album.description ? `<p class="album-card-description">${escapeHtml(album.description)}</p>` : ''}
             <div class="album-card-meta">
-                <span class="album-card-photos">${album.photoCount} photos</span>
-                <span class="album-card-date">${createdDate}</span>
+                <span class="album-card-photos">
+                    <i class="far fa-images"></i> ${photoCountText}
+                </span>
+                <span class="album-card-date">
+                    <i class="far fa-calendar-alt"></i> ${createdDate}
+                </span>
             </div>
         </div>
         ${window.albumsConfig.isOwnProfile ? createAlbumActions(album.id, album.name) : ''}
@@ -83,7 +101,7 @@ function createAlbumCard(album) {
     return card;
 }
 
-//Create action buttons (Edit, Delete) - only for owner
+// Create action buttons (Edit, Delete) - only for owner
 function createAlbumActions(albumId, albumName) {
     return `
         <div class="album-card-actions">
@@ -98,7 +116,7 @@ function createAlbumActions(albumId, albumName) {
 }
 
 
-//Create Album
+// Create Album
 function openCreateAlbumModal() {
     document.getElementById('albumName').value = '';
     document.getElementById('albumDescription').value = '';
@@ -146,9 +164,9 @@ async function createAlbum() {
     }
 }
 
-//Edit Album
+// Edit Album
 function openEditAlbumModal(albumId) {
-    //Find the album card to get current values
+    // Find the album card to get current values
     const cards = document.querySelectorAll('.album-card');
 
     cards.forEach(card => {
@@ -176,7 +194,7 @@ async function updateAlbum() {
     const name = document.getElementById('editAlbumName').value.trim();
     const description = document.getElementById('editAlbumDescription').value.trim();
 
-    //Validate
+    // Validate
     if (!name) {
         showError('editAlbumNameError', 'Album name is required');
         return;
@@ -208,7 +226,7 @@ async function updateAlbum() {
     }
 }
 
-//Delete album
+// Delete album
 let albumToDelete = null;
 
 function openDeleteAlbumModal(albumId, albumName) {
@@ -238,7 +256,7 @@ async function confirmDeleteAlbum() {
             return;
         }
 
-        //Success - close modal and reload albums
+        // Success - close modal and reload albums
         closeDeleteAlbumModal();
         loadAlbums();
     }
@@ -247,7 +265,7 @@ async function confirmDeleteAlbum() {
     }
 }
 
-//Utility functions
+// Utility functions
 function showError(elementId, message) {
     const errorEl = document.getElementById(elementId);
     if (errorEl) {
