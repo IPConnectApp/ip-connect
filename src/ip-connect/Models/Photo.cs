@@ -13,7 +13,8 @@ namespace ip_connect.Models
         public DateTime UploadedAt { get; set; }
 
         // Navigation properties
-        public Album Album { get; set; }
+        [ForeignKey(nameof(AlbumId))] // Казваме на EF, че AlbumId е ключът за Album
+        public Album Album { get; set; } = null!;
         public ApplicationUser User { get; set; }
     }
 }

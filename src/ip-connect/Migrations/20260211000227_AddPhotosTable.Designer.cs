@@ -12,7 +12,7 @@ using ip_connect.Data;
 namespace ip_connect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260210234533_AddPhotosTable")]
+    [Migration("20260211000227_AddPhotosTable")]
     partial class AddPhotosTable
     {
         /// <inheritdoc />
@@ -447,9 +447,6 @@ namespace ip_connect.Migrations
                     b.Property<int>("AlbumId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("AlbumId1")
-                        .HasColumnType("int");
-
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
 
@@ -470,8 +467,6 @@ namespace ip_connect.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AlbumId");
-
-                    b.HasIndex("AlbumId1");
 
                     b.HasIndex("UserId");
 
@@ -580,7 +575,7 @@ namespace ip_connect.Migrations
                     b.HasOne("ip_connect.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -675,19 +670,15 @@ namespace ip_connect.Migrations
             modelBuilder.Entity("ip_connect.Models.Photo", b =>
                 {
                     b.HasOne("ip_connect.Models.Album", "Album")
-                        .WithMany()
+                        .WithMany("Photos")
                         .HasForeignKey("AlbumId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ip_connect.Models.Album", null)
-                        .WithMany("Photos")
-                        .HasForeignKey("AlbumId1");
-
                     b.HasOne("ip_connect.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Album");

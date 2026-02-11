@@ -91,8 +91,7 @@ namespace ip_connect.Migrations
                         name: "FK_Albums_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -298,8 +297,7 @@ namespace ip_connect.Migrations
                     AlbumId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false),
-                    UploadedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    AlbumId1 = table.Column<int>(type: "int", nullable: true)
+                    UploadedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()")
                 },
                 constraints: table =>
                 {
@@ -311,16 +309,10 @@ namespace ip_connect.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Photos_Albums_AlbumId1",
-                        column: x => x.AlbumId1,
-                        principalTable: "Albums",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Photos_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -473,11 +465,6 @@ namespace ip_connect.Migrations
                 name: "IX_Photos_AlbumId",
                 table: "Photos",
                 column: "AlbumId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Photos_AlbumId1",
-                table: "Photos",
-                column: "AlbumId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Photos_UserId",

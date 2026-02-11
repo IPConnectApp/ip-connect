@@ -24,7 +24,6 @@ namespace ip_connect.Models
         // Navigation properties
         [ForeignKey(nameof(UserId))]
         public ApplicationUser? User { get; set; }
-        
-        public ICollection<Photo> Photos { get; set; }
+        public ICollection<Photo> Photos { get; set; } = new List<Photo>();
     }
 }
