@@ -1,4 +1,4 @@
-﻿// Album Photo Manager - Modern ES6+ Implementation
+﻿// Album Photo Manager - Enhanced with Drag & Drop Reordering
 class AlbumPhotoManager {
     constructor(albumId, isOwnProfile) {
         console.log('=== AlbumPhotoManager Constructor ===');
@@ -9,6 +9,9 @@ class AlbumPhotoManager {
         this.isOwnProfile = isOwnProfile;
         this.photos = [];
         this.isUploading = false;
+        this.currentLightboxIndex = 0;
+        this.draggedElement = null;
+        this.draggedPhotoId = null;
 
         // Validate inputs
         if (!this.albumId) {
@@ -32,8 +35,6 @@ class AlbumPhotoManager {
         if (fileInput) {
             fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
             console.log('✅ File input listener attached');
-        } else {
-            console.warn('⚠️ File input not found');
         }
 
         // Browse files button
@@ -41,8 +42,6 @@ class AlbumPhotoManager {
         if (browseBtn) {
             browseBtn.addEventListener('click', () => fileInput?.click());
             console.log('✅ Browse button listener attached');
-        } else {
-            console.warn('⚠️ Browse button not found');
         }
 
         // Drag and drop area
@@ -62,9 +61,69 @@ class AlbumPhotoManager {
 
             dropArea.addEventListener('drop', (e) => this.handleDrop(e), false);
             console.log('✅ Drag & drop listeners attached');
-        } else {
-            console.warn('⚠️ Drop area not found (user may not be owner)');
         }
+
+        // Edit Album button
+        const btnEdit = document.getElementById('btnEditAlbum');
+        if (btnEdit) {
+            btnEdit.addEventListener('click', () => {
+                console.log('📝 Edit Album clicked');
+                // Placeholder for edit functionality
+                alert('Edit Album functionality will be implemented');
+            });
+        }
+
+        // Delete Album button
+        const btnDelete = document.getElementById('btnDeleteAlbum');
+        if (btnDelete) {
+            btnDelete.addEventListener('click', () => {
+                console.log('🗑️ Delete Album clicked');
+                if (confirm('Are you sure you want to delete this album? All photos will be lost.')) {
+                    // Placeholder for delete functionality
+                    alert('Delete Album functionality will be implemented');
+                }
+            });
+        }
+
+        // Lightbox controls
+        this.setupLightbox();
+    }
+
+    setupLightbox() {
+        const lightboxClose = document.getElementById('lightboxClose');
+        const lightboxPrev = document.getElementById('lightboxPrev');
+        const lightboxNext = document.getElementById('lightboxNext');
+        const lightboxModal = document.getElementById('lightboxModal');
+
+        if (lightboxClose) {
+            lightboxClose.addEventListener('click', () => this.closeLightbox());
+        }
+
+        if (lightboxPrev) {
+            lightboxPrev.addEventListener('click', () => this.navigateLightbox(-1));
+        }
+
+        if (lightboxNext) {
+            lightboxNext.addEventListener('click', () => this.navigateLightbox(1));
+        }
+
+        if (lightboxModal) {
+            lightboxModal.addEventListener('click', (e) => {
+                if (e.target === lightboxModal) {
+                    this.closeLightbox();
+                }
+            });
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('lightboxModal');
+            if (modal && modal.classList.contains('active')) {
+                if (e.key === 'Escape') this.closeLightbox();
+                if (e.key === 'ArrowLeft') this.navigateLightbox(-1);
+                if (e.key === 'ArrowRight') this.navigateLightbox(1);
+            }
+        });
     }
 
     preventDefaults(e) {
@@ -73,11 +132,11 @@ class AlbumPhotoManager {
     }
 
     highlight(element) {
-        element.classList.add('border-primary', 'bg-primary-subtle');
+        element.classList.add('drag-over');
     }
 
     unhighlight(element) {
-        element.classList.remove('border-primary', 'bg-primary-subtle');
+        element.classList.remove('drag-over');
     }
 
     handleFileSelect(event) {
@@ -119,6 +178,7 @@ class AlbumPhotoManager {
             this.photos = await response.json();
             console.log('✅ Photos loaded:', this.photos.length);
             this.renderPhotos();
+            this.updatePhotoCount();
 
         } catch (error) {
             console.error('❌ Error loading photos:', error);
@@ -139,7 +199,6 @@ class AlbumPhotoManager {
             return;
         }
 
-        // Validate files
         const validFiles = this.validateFiles(files);
         if (validFiles.length === 0) {
             return;
@@ -152,7 +211,6 @@ class AlbumPhotoManager {
             console.log(`📤 Uploading ${validFiles.length} files to album ${this.albumId}...`);
 
             const formData = new FormData();
-
             validFiles.forEach(file => {
                 formData.append('files', file);
             });
@@ -172,10 +230,8 @@ class AlbumPhotoManager {
             console.log('✅ Upload successful:', result);
             this.showSuccess(result.message || 'Photos uploaded successfully');
 
-            // Reload photos
             await this.loadPhotos();
 
-            // Reset file input
             const fileInput = document.getElementById('photoFileInput');
             if (fileInput) {
                 fileInput.value = '';
@@ -196,14 +252,12 @@ class AlbumPhotoManager {
         const validFiles = [];
 
         for (const file of files) {
-            // Check file type
             const extension = file.name.split('.').pop().toLowerCase();
             if (!validExtensions.includes(extension)) {
                 this.showError(`Invalid file type: ${file.name}. Allowed: ${validExtensions.join(', ')}`);
                 continue;
             }
 
-            // Check file size
             if (file.size > maxFileSize) {
                 this.showError(`File too large: ${file.name}. Max size: 10MB`);
                 continue;
@@ -245,9 +299,9 @@ class AlbumPhotoManager {
             console.log('✅ Photo deleted successfully');
             this.showSuccess('Photo deleted successfully');
 
-            // Remove from local array
             this.photos = this.photos.filter(p => p.id !== photoId);
             this.renderPhotos();
+            this.updatePhotoCount();
 
         } catch (error) {
             console.error('❌ Delete error:', error);
@@ -266,74 +320,187 @@ class AlbumPhotoManager {
 
         if (this.photos.length === 0) {
             container.innerHTML = `
-                <div class="col-12">
-                    <div class="text-center py-5">
-                        <i class="fas fa-image text-muted" style="font-size: 4rem;"></i>
-                        <p class="text-muted mt-3">No Photos Yet</p>
-                        ${this.isOwnProfile ? '<p class="text-muted">Upload your first photo to this album!</p>' : ''}
-                    </div>
+                <div class="empty-gallery">
+                    <i class="far fa-image empty-gallery-icon"></i>
+                    <h3>No photos yet</h3>
+                    <p>${this.isOwnProfile ? 'Upload your first photo to bring this album to life!' : 'This album is empty.'}</p>
                 </div>
             `;
             return;
         }
 
-        container.innerHTML = this.photos.map(photo => `
-            <div class="col-6 col-md-4 col-lg-3 mb-3" data-photo-id="${photo.id}">
-                <div class="card photo-card">
-                    <img src="${this.escapeHtml(photo.url)}" 
-                         class="card-img-top" 
-                         alt="Photo"
-                         loading="lazy"
-                         style="aspect-ratio: 1; object-fit: cover; cursor: pointer;"
-                         onclick="albumManager.openPhotoModal('${this.escapeHtml(photo.url)}')">
-                    ${this.isOwnProfile ? `
-                        <div class="card-body p-2">
-                            <button class="btn btn-sm btn-danger w-100" 
-                                    onclick="albumManager.deletePhoto(${photo.id})">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </div>
-                    ` : ''}
-                </div>
+        container.innerHTML = this.photos.map((photo, index) => `
+            <div class="photo-card" 
+                 data-photo-id="${photo.id}" 
+                 data-index="${index}"
+                 draggable="${this.isOwnProfile}">
+                <img src="${this.escapeHtml(photo.url)}" 
+                     alt="Photo ${index + 1}"
+                     loading="lazy"
+                     onclick="albumManager.openLightbox(${index})">
+                ${this.isOwnProfile ? `
+                    <div class="photo-overlay">
+                        <button class="btn-photo-delete" 
+                                onclick="event.stopPropagation(); albumManager.deletePhoto(${photo.id})"
+                                title="Delete photo">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                ` : ''}
             </div>
         `).join('');
+
+        // Setup drag and drop for reordering (only for owner)
+        if (this.isOwnProfile) {
+            this.setupPhotoReordering();
+        }
 
         console.log('✅ Photos rendered');
     }
 
-    openPhotoModal(photoUrl) {
-        // Create modal dynamically if it doesn't exist
-        let modal = document.getElementById('photoModal');
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'photoModal';
-            modal.className = 'modal fade';
-            modal.innerHTML = `
-                <div class="modal-dialog modal-dialog-centered modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body p-0">
-                            <img id="photoModalImage" src="" class="w-100" alt="Photo">
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
+    setupPhotoReordering() {
+        const photoCards = document.querySelectorAll('.photo-card');
+
+        photoCards.forEach(card => {
+            card.addEventListener('dragstart', (e) => this.handleDragStart(e));
+            card.addEventListener('dragover', (e) => this.handleDragOver(e));
+            card.addEventListener('drop', (e) => this.handlePhotoReorder(e));
+            card.addEventListener('dragend', (e) => this.handleDragEnd(e));
+            card.addEventListener('dragenter', (e) => this.handleDragEnter(e));
+            card.addEventListener('dragleave', (e) => this.handleDragLeave(e));
+        });
+    }
+
+    handleDragStart(e) {
+        this.draggedElement = e.currentTarget;
+        this.draggedPhotoId = parseInt(e.currentTarget.dataset.photoId);
+        e.currentTarget.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', e.currentTarget.innerHTML);
+    }
+
+    handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        return false;
+    }
+
+    handleDragEnter(e) {
+        if (e.currentTarget !== this.draggedElement) {
+            e.currentTarget.classList.add('drag-over');
+        }
+    }
+
+    handleDragLeave(e) {
+        e.currentTarget.classList.remove('drag-over');
+    }
+
+    handleDragEnd(e) {
+        e.currentTarget.classList.remove('dragging');
+
+        // Remove all drag-over classes
+        document.querySelectorAll('.photo-card').forEach(card => {
+            card.classList.remove('drag-over');
+        });
+    }
+
+    async handlePhotoReorder(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const dropTarget = e.currentTarget;
+        dropTarget.classList.remove('drag-over');
+
+        if (this.draggedElement === dropTarget) {
+            return;
         }
 
-        const img = document.getElementById('photoModalImage');
-        img.src = photoUrl;
+        const draggedIndex = parseInt(this.draggedElement.dataset.index);
+        const targetIndex = parseInt(dropTarget.dataset.index);
 
-        const bsModal = new bootstrap.Modal(modal);
-        bsModal.show();
+        // Reorder in local array
+        const [movedPhoto] = this.photos.splice(draggedIndex, 1);
+        this.photos.splice(targetIndex, 0, movedPhoto);
+
+        // Re-render immediately for visual feedback
+        this.renderPhotos();
+
+        // Send reorder request to backend
+        await this.savePhotoOrder();
+    }
+
+    async savePhotoOrder() {
+        try {
+            const reorderData = this.photos.map((photo, index) => ({
+                photoId: photo.id,
+                newOrder: index
+            }));
+
+            const response = await fetch('/api/albums/photos/reorder', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(reorderData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save photo order');
+            }
+
+            console.log('✅ Photo order saved');
+        } catch (error) {
+            console.error('❌ Error saving photo order:', error);
+            this.showError('Failed to save photo order');
+            // Reload to get correct order from server
+            await this.loadPhotos();
+        }
+    }
+
+    updatePhotoCount() {
+        const badge = document.getElementById('photoCountBadge');
+        if (badge) {
+            const count = this.photos.length;
+            badge.textContent = `${count} photo${count !== 1 ? 's' : ''}`;
+        }
+    }
+
+    openLightbox(index) {
+        this.currentLightboxIndex = index;
+        const modal = document.getElementById('lightboxModal');
+        const img = document.getElementById('lightboxImage');
+        const counter = document.getElementById('lightboxCounter');
+
+        if (modal && img) {
+            img.src = this.photos[index].url;
+            counter.textContent = `${index + 1} / ${this.photos.length}`;
+            modal.classList.add('active');
+        }
+    }
+
+    closeLightbox() {
+        const modal = document.getElementById('lightboxModal');
+        if (modal) {
+            modal.classList.remove('active');
+        }
+    }
+
+    navigateLightbox(direction) {
+        this.currentLightboxIndex += direction;
+
+        if (this.currentLightboxIndex < 0) {
+            this.currentLightboxIndex = this.photos.length - 1;
+        } else if (this.currentLightboxIndex >= this.photos.length) {
+            this.currentLightboxIndex = 0;
+        }
+
+        this.openLightbox(this.currentLightboxIndex);
     }
 
     showLoading(show) {
         const indicator = document.getElementById('loadingIndicator');
         if (indicator) {
-            indicator.style.display = show ? 'block' : 'none';
+            indicator.style.display = show ? 'flex' : 'none';
         }
     }
 
@@ -355,7 +522,6 @@ class AlbumPhotoManager {
     }
 
     showToast(message, type = 'info') {
-        // Create toast container if it doesn't exist
         let toastContainer = document.getElementById('toastContainer');
         if (!toastContainer) {
             toastContainer = document.createElement('div');
@@ -384,7 +550,6 @@ class AlbumPhotoManager {
         const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 5000 });
         bsToast.show();
 
-        // Remove toast element after it's hidden
         toast.addEventListener('hidden.bs.toast', () => {
             toast.remove();
         });
@@ -412,11 +577,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const albumIdElement = document.getElementById('albumId');
     const isOwnProfileElement = document.getElementById('isOwnProfile');
 
-    console.log('albumId element:', albumIdElement);
-    console.log('isOwnProfile element:', isOwnProfileElement);
-
     const albumId = albumIdElement?.value;
-    const isOwnProfile = isOwnProfileElement?.value === 'True' || isOwnProfileElement?.value === 'true';
+    const isOwnProfile = isOwnProfileElement?.value === 'true';
 
     console.log('Parsed albumId:', albumId);
     console.log('Parsed isOwnProfile:', isOwnProfile);
@@ -426,8 +588,5 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('✅ Album manager initialized');
     } else {
         console.error('❌ Cannot initialize - albumId is missing!');
-        console.log('Available elements:');
-        console.log('- albumId element:', albumIdElement);
-        console.log('- albumId value:', albumIdElement?.value);
     }
 });

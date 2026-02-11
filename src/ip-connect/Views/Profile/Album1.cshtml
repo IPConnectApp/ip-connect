@@ -1,6 +1,6 @@
 @{
     ViewData["Title"] = ViewData["AlbumName"]?.ToString() ?? "Album Details";
-    ViewData["CurrentTab"] = "Albums";
+    ViewData["CurrentTab"] = "Albums"; // Highlight Photos tab
     Layout = "_ProfileLayout";
     var albumId = ViewData["AlbumId"];
     var isOwnProfile = (bool)(ViewData["IsOwnProfile"] ?? false);
@@ -11,7 +11,6 @@
 
 <div class="album-details-container">
 
-    <!-- Header Section -->
     <div class="album-header-section">
         <div class="album-header-left">
             <div class="album-nav-row">
@@ -30,7 +29,7 @@
                 </span>
             </div>
 
-            @if (ViewData["AlbumDescription"] != null && !string.IsNullOrWhiteSpace(ViewData["AlbumDescription"].ToString()))
+            @if (ViewData["AlbumDescription"] != null)
             {
                 <div class="album-description-box">
                     @ViewData["AlbumDescription"]
@@ -38,15 +37,19 @@
             }
         </div>
 
+        @if (isOwnProfile)
+        {
+            <div class="album-header-actions">
+                <button class="btn-action-outline" onclick="openEditAlbumModal()">
+                    <i class="fas fa-pen"></i> Edit
+                </button>
+                <button class="btn-action-danger" onclick="confirmDeleteAlbum()">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+            </div>
+        }
     </div>
 
-    <!-- Photos Grid with Drag & Drop Reordering -->
-    <div id="photoGallery" class="photos-masonry">
-        <!-- Photos will be rendered here by JavaScript -->
-    </div>
-    <br />
-
-    <!-- Upload Section (Only for owner) -->
     @if (isOwnProfile)
     {
         <div class="upload-container">
@@ -77,16 +80,24 @@
         </div>
     }
 
+    <div id="photoGallery" class="photos-masonry">
+    </div>
 
-    <!-- Loading Indicator -->
     <div id="loadingIndicator" class="gallery-loader" style="display:none;">
         <i class="fas fa-circle-notch fa-spin"></i>
         <span>Loading your memories...</span>
     </div>
 
+    <div id="emptyStateTemplate" style="display:none;">
+        <div class="empty-gallery">
+            <i class="far fa-image empty-gallery-icon"></i>
+            <h3>No photos yet</h3>
+            <p>Upload your first photo to bring this album to life.</p>
+        </div>
+    </div>
+
 </div>
 
-<!-- Lightbox Modal for Full View -->
 <div id="lightboxModal" class="lightbox-modal">
     <button class="lightbox-close" id="lightboxClose">&times;</button>
     <button class="lightbox-nav lightbox-prev" id="lightboxPrev"><i class="fas fa-chevron-left"></i></button>
