@@ -65,7 +65,14 @@ namespace ip_connect.Tests.ServiceTests
             var mockAlbumRepo = new Mock<IAlbumRepository>();
             var mockFriendshipRepo = new Mock<IFriendshipRepository>();
 
-            var album = new Album { Id = 1, UserId = "user1", Name = "Vacation", Description = "Trip", CreatedAt = DateTime.UtcNow };
+            var album = new Album
+            {
+                Id = 1,
+                UserId = "user1",
+                Name = "Vacation",
+                Description = "Trip",
+                CreatedAt = DateTime.UtcNow
+            };
 
             mockAlbumRepo.Setup(r => r.GetAlbumByIdAsync(1))
                 .ReturnsAsync(album);
