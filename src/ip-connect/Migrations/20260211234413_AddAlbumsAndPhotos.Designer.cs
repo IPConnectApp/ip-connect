@@ -12,8 +12,8 @@ using ip_connect.Data;
 namespace ip_connect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260211000227_AddPhotosTable")]
-    partial class AddPhotosTable
+    [Migration("20260211234413_AddAlbumsAndPhotos")]
+    partial class AddAlbumsAndPhotos
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

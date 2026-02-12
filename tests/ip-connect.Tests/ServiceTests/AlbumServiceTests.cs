@@ -67,13 +67,13 @@ namespace ip_connect.Tests.ServiceTests
 
             var album = new Album { Id = 1, UserId = "user1", Name = "Vacation", Description = "Trip", CreatedAt = DateTime.UtcNow };
 
-            mockAlbumRepo.Setup(r => r.GetByIdAsync(1))
+            mockAlbumRepo.Setup(r => r.GetAlbumByIdAsync(1))
                 .ReturnsAsync(album);
 
             var service = new AlbumService(mockAlbumRepo.Object, mockFriendshipRepo.Object);
 
             // Act
-            var result = await service.GetAlbumByIdAsync(1);
+            var result = await service.GetAlbumByIdAsync(1, "user1");
 
             // Assert
             result.Should().NotBeNull();
@@ -88,16 +88,14 @@ namespace ip_connect.Tests.ServiceTests
             var mockAlbumRepo = new Mock<IAlbumRepository>();
             var mockFriendshipRepo = new Mock<IFriendshipRepository>();
 
-            mockAlbumRepo.Setup(r => r.GetByIdAsync(999))
+            mockAlbumRepo.Setup(r => r.GetAlbumByIdAsync(999))
                 .ReturnsAsync((Album?)null);
 
             var service = new AlbumService(mockAlbumRepo.Object, mockFriendshipRepo.Object);
 
-            // Act
-            var result = await service.GetAlbumByIdAsync(999);
-
-            // Assert
-            result.Should().BeNull();
+            // Act & Assert
+            await Assert.ThrowsAsync<NotFoundException>(() =>
+                service.GetAlbumByIdAsync(999, "user1"));
         }
 
         [Fact]
