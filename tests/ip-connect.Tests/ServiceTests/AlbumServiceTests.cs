@@ -95,7 +95,7 @@ namespace ip_connect.Tests.ServiceTests
             var mockAlbumRepo = new Mock<IAlbumRepository>();
             var mockFriendshipRepo = new Mock<IFriendshipRepository>();
 
-            mockAlbumRepo.Setup(r => r.GetByIdAsync(999))
+            mockAlbumRepo.Setup(r => r.GetAlbumByIdAsync(999))
                 .ReturnsAsync((Album?)null);
 
             var service = new AlbumService(mockAlbumRepo.Object, mockFriendshipRepo.Object);
